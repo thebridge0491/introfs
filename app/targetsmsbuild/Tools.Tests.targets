@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+	<TestFsFiles Include="tests\**\*.fs"/>
+	<TestCompile Condition=" '@(TestFsFiles)' != '' "
+	  Include="tests\**\*.fs"/>
+	<TestCompile Condition=" '@(TestFsFiles)' == '' " 
+	  Include="tests\**\*.cs"/>
+  </ItemGroup>
+  
+  <Choose>
+    <When Condition=" '$(TestLibrary)' == 'xunit' ">
+      <PropertyGroup>
+        <TestMonoPath>.:$(MONO_PATH):$(HOME)\nuget\packages\FsCheck\lib\net45:$(HOME)\nuget\packages\FsCheck.Xunit\lib\net45:$(HOME)\nuget\packages\FsUnit.xUnit\Lib\net40</TestMonoPath>
+        <TestConsoleApp>$(HOME)\nuget\packages\xunit.runners\tools\xunit.console.exe</TestConsoleApp>
+        <TestAppArgs></TestAppArgs>
+      </PropertyGroup>
+      <ItemGroup>
+        <TestReference Include="xunit\lib\net20\xunit.dll"/>
+        <!--<TestReference Include="xunit.runners.dll"/>-->
+	    <TestReference Include="FsCheck\lib\net45\FsCheck.dll"/>
+        <TestReference Include="FsCheck.Xunit\lib\net45\FsCheck.Xunit.dll"/>
+        <None Include="$(HOME)\nuget\packages\xunit\lib\net20\xunit.dll">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+      </ItemGroup>
+      <ItemGroup Condition=" '@(TestFsFiles)' != '' ">
+        <TestReference Include="FsUnit.xUnit\Lib\net40\FsUnit.Xunit.dll"/>
+        <TestReference Include="FsUnit.xUnit\Lib\net40\NHamcrest.dll"/>
+        <TestReference Include="FsUnit.xUnit\Lib\net40\FsUnit.CustomMatchers.dll"/>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <TestMonoPath>.:$(MONO_PATH):$(HOME)\nuget\packages\NUnit.Runners\tools\lib:$(HOME)\nuget\packages\FsCheck\lib\net45:$(HOME)\nuget\packages\FsCheck.Nunit\lib\net45:$(HOME)\nuget\packages\FsUnit\Lib\Net40</TestMonoPath>
+        <TestConsoleApp>$(HOME)\nuget\packages\NUnit.Runners\tools\nunit-console.exe</TestConsoleApp>
+        <TestAppArgs>-nologo -domain=None -labels -xml=$(TargetDir)TestResult.xml -output=$(TargetDir)testout.txt -err=$(TargetDir)testerrs.txt</TestAppArgs>
+      </PropertyGroup>    
+      <ItemGroup>
+        <TestReference Include="NUnit\lib\nunit.framework.dll"/>
+	    <TestReference Include="NUnit.AddinsDependencies\lib\nunit.core.dll"/>
+	    <TestReference Include="NUnit.AddinsDependencies\lib\nunit.core.interfaces.dll"/>
+	    <TestReference Include="FsCheck\lib\net45\FsCheck.dll"/>
+	    <TestReference Include="FsCheck.Nunit\lib\net45\FsCheck.NUnit.Addin.dll"/>
+	    <TestReference Include="FsCheck.Nunit\lib\net45\FsCheck.NUnit.dll"/>
+      </ItemGroup>
+      <ItemGroup Condition=" '@(TestFsFiles)' != '' ">
+        <TestReference Include="FsUnit\Lib\Net40\FsUnit.NUnit.dll"/>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+  
+  <Target Name="_TestFsCompile" Condition=" '@(TestFsFiles)' != '' "
+      Inputs="@(TestCompile)" Outputs="$(TargetDir)$(AssemblyName).Tests.dll">
+    <Fsc OutputAssembly="$(TargetDir)$(AssemblyName).Tests.dll"
+      Sources="@(TestCompile)" References="@(TestReference)"
+      ReferencePath="$(AdditionalLibPaths)" TargetType="library"
+      Optimize="$(Optimize)" DefineConstants="$(DefineConstants)"
+      DebugSymbols="$(DebugSymbols)" DebugType="$(DebugType)"/>
+  </Target>
+  <Target Name="_TestCsCompile" Condition=" '@(TestFsFiles)' == '' "
+      Inputs="@(TestCompile)" Outputs="$(TargetDir)$(AssemblyName).Tests.dll">
+    <Csc OutputAssembly="$(TargetDir)$(AssemblyName).Tests.dll"
+      Sources="@(TestCompile)" References="@(TestReference)"
+      AdditionalLibPaths="$(AdditionalLibPaths)" TargetType="library"
+      Optimize="$(Optimize)" DefineConstants="$(DefineConstants)"
+      EmitDebugInformation="$(DebugSymbols)" DebugType="$(DebugType)"
+      NoLogo="true" CheckForOverflowUnderflow="true"/>
+  </Target>
+  <Target Name="TestCompile" DependsOnTargets="_TestFsCompile;_TestCsCompile"/>
+  
+  <Target Name="Test" DependsOnTargets="TestCompile">
+    <Exec WorkingDirectory="$(TargetDir)" IgnoreExitCode="true"
+      Command="MONO_PATH=$(TestMonoPath) DYLD_LIBRARY_PATH=$(DYLD_LIBRARY_PATH) LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(ExeLauncher) $(TestConsoleApp) $(TestAppArgs) $(TargetDir)$(AssemblyName).Tests.dll $(TOPTS)"/>
+  </Target>
+  <Target Name="MonoCover" Condition=" '$(OS)' != 'Windows_NT' "
+      DependsOnTargets="TestCompile">
+    <Exec WorkingDirectory="$(TargetDir)" IgnoreExitCode="true"
+      Command="MONO_PATH=$(TestMonoPath) DYLD_LIBRARY_PATH=$(DYLD_LIBRARY_PATH) LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(ExeLauncher) --debug --profile=coverage:output=$(ProjectDir)build\cov.xml,covfilter-file=$(ProjectDir)resources\covfilter.txt --profile=log:output=$(ProjectDir)build\cov.dat,coverage,covfilter-file=$(ProjectDir)resources\covfilter.txt $(TestConsoleApp) $(TestAppArgs) $(TargetDir)$(AssemblyName).Tests.dll $(TOPTS) ; mprof-report --reports=coverage $(ProjectDir)build\cov.dat > $(ProjectDir)build\cov.txt"/>
+  </Target>
+</Project>

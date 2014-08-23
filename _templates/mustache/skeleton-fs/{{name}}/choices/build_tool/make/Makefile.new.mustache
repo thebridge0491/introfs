@@ -1,0 +1,100 @@
+# Single package Makefile script.
+.SUFFIXES: .cs .fs .dll
+help:
+
+PKG_CONFIG = pkg-config --with-path=$(PREFIX)/lib/pkgconfig
+
+pkg ?= {{projectcap}}{{^projectcap}}Util{{/projectcap}}
+proj ?= {{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}
+namespace_path ?= $(shell echo $(proj) | tr 'A-Z' 'a-z' | sed 'y|.|/|')
+version = {{version}}{{^version}}0.1.0{{/version}}
+
+# nunit, xunit
+TESTFRWK = nunit
+{{#executable}}
+# library, exe, module
+outputtype = exe
+startupopts = /main:$(proj).App
+resourceopts = $(shell ls resources | sed 's|^\(.*\)$$|/resource:resources/\1,$(proj).resources.\1|g')
+{{/executable}}
+{{^executable}}
+# library, exe, module
+outputtype = library
+#startupopts = /main:$(proj).App
+resourceopts = $(shell ls resources | grep -vie 'App.config' | sed 's|^\(.*\)$$|/resource:resources/\1,$(proj).resources.\1|g')
+{{/executable}}
+keyfileopts ?= /delaysign /keyfile:snkeyfile.snk.pub
+
+ifdef DEBUG
+CONFIG = Debug
+CSCFLAGS := $(CSCFLAGS) /debug /d:DEBUG /d:TRACE
+FSCFLAGS := $(FSCFLAGS) /debug /d:DEBUG /d:TRACE
+
+else
+CONFIG = Release
+CSCFLAGS := $(CSCFLAGS) /optimize
+FSCFLAGS := $(FSCFLAGS) /optimize
+endif
+
+ifeq ($(outputtype),module)
+outext = netmodule
+
+else ifeq ($(outputtype),exe)
+outext = exe
+
+else
+outext = dll
+endif
+
+OUTPUTPATH = build/bin/$(CONFIG)
+ADDLIBPATHS := $(ADDLIBPATHS) /lib:.,/usr/lib/mono/fsharp,/usr/local/lib/mono/fsharp,$(HOME)/nuget/packages,build,$(OUTPUTPATH)
+# /platform:x64
+CSCFLAGS := $(CSCFLAGS) /nologo /warn:4 /checked $(ADDLIBPATHS)
+FSCFLAGS := $(FSCFLAGS) /nologo /warn:3 /checked $(ADDLIBPATHS)
+
+#AddModulesOpts = # /addmodule:$(OUTPUTPATH)/$(proj).netmodule /addmodule:$(OUTPUTPATH)/$(proj).netmodule
+#OtherAssemblies = # $(OUTPUTPATH)/$(proj)*.exe $(OUTPUTPATH)/$(proj)*.dll
+
+# log4net Mono.Options Newtonsoft.Json YamlDotNet
+refs_src := $(refs_src) $(shell $(PKG_CONFIG) --libs ini-parser)
+
+src_cs = $(shell ls src/cs/**/*.cs src/cs/**/**/*.cs)
+src_fs = $(shell ls src/fs/**/*.fs src/fs/**/**/*.fs | grep -ve App) $(shell ls src/fs/**/App.fs src/fs/**/**/App.fs)
+
+
+#src_monooptions = $(shell $(PKG_CONFIG) --variable=Sources mono-options)
+#
+#$(OUTPUTPATH)/Mono.Options.dll : $(src_monooptions)
+#	printf "using System.Reflection;\n[assembly: AssemblyVersion(\"1.1.0\")]" \
+#		> $(OUTPUTPATH)/MonoOptionsAssemblyInfo.cs
+#	$(CSC) $(CSCFLAGS) /t:library $(keyfileopts) \
+#		/doc:$(OUTPUTPATH)/Mono.Options.xml /out:$@ \
+#		$(src_monooptions) $(OUTPUTPATH)/MonoOptionsAssemblyInfo.cs
+#	gacutil -root $(HOME)/.local/lib -package Mono.Options -i $@
+#	gacutil -root $(HOME)/.local/lib -l ; sleep 3
+
+
+#ifeq ($(TESTFRWK),xunit)
+#refs_tests := $(refs_tests) /r:FsUnit.xUnit/Lib/net40/FsUnit.Xunit.dll /r:FsUnit.xUnit/Lib/net40/NHamcrest.dll /r:FsUnit.xUnit/Lib/net40/FsUnit.CustomMatchers.dll
+#else
+#refs_tests := $(refs_tests) /r:FsUnit/Lib/Net40/FsUnit.NUnit.dll
+#endif
+refs_tests := $(refs_tests) /r:$(proj).$(outext)
+
+#tests_cs = $(patsubst %,%,$(wildcard tests/cs/**/*.cs tests/cs/**/**/*.cs))
+tests_cs = $(shell ls tests/cs/**/*.cs tests/cs/**/**/*.cs)
+tests_fs = $(shell ls tests/fs/**/*.fs tests/fs/**/**/*.fs)
+
+build/.depend:
+	-@mkdir -p $(OUTPUTPATH) ; cp snkeyfile.snk.pub $(OUTPUTPATH)/
+	-@echo '' > build/.depend
+
+.PHONY: build
+
+#cstargets = $(OUTPUTPATH)/$(proj).CSharp.dll
+fstargets = $(OUTPUTPATH)/$(proj).$(outext)
+
+build: build/.depend $(cstargets) $(fstargets) ## build
+
+-include build/.depend Makefile-targets.mk
+#-include Makefile-auxffi.mk

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!-- To generate new guid, from C#: csharp -e 'System.Guid.NewGuid()' -->
+    <!--   or from Python: python -c 'import uuid ; print(uuid.uuid4())' -->
+    <ProjectGuid>{7471c95f-b96b-425a-b43f-e16bfa02f32f}</ProjectGuid>
+    <!--<RootNamespace>Introfs.Util.CSharp</RootNamespace>-->
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <OutputType Condition=" '$(OutputType)' == '' ">library</OutputType>
+    <AssemblyOriginatorKeyFile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe'">$(ParentProjectDir)snkeyfile.snk.pub</AssemblyOriginatorKeyFile>
+    <SignAssembly Condition=" '$(AssemblyOriginatorKeyFile)' != '' ">true</SignAssembly>
+    <DelaySign Condition=" '$(AssemblyOriginatorKeyFile)' != '' ">true</DelaySign>
+    <TargetFrameworkVersion Condition=" '$(TargetFrameworkVersion)' == '' ">v4.5</TargetFrameworkVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <AdditionalLibPaths>$(HOME)\nuget\packages</AdditionalLibPaths>
+  </PropertyGroup>
+  <Choose>
+    <When Condition=" '$(Configuration)' == 'Release' ">
+      <PropertyGroup>
+        <IntermediateOutputPath>$(ParentProjectDir)build\obj\$(Configuration)</IntermediateOutputPath>
+        <OutputPath>$(ParentProjectDir)build\bin\$(Configuration)</OutputPath>
+        <AdditionalLibPaths>$(AdditionalLibPaths);$(OutputPath)</AdditionalLibPaths>
+        <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
+        <DebugSymbols>false</DebugSymbols>
+        <Optimize>true</Optimize>
+        <ErrorReport>prompt</ErrorReport>
+        <ConsolePause>false</ConsolePause>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <IntermediateOutputPath>$(ParentProjectDir)build\obj\Debug</IntermediateOutputPath>
+        <OutputPath>$(ParentProjectDir)build\bin\Debug</OutputPath>
+        <AdditionalLibPaths>$(AdditionalLibPaths);$(OutputPath)</AdditionalLibPaths>
+        <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <ConsolePause>false</ConsolePause>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+  <ItemGroup>
+    <Reference Include="System"/>
+    <Reference Include="Mono.Options"/>
+    <!--<Reference Include="log4net">
+	  <HintPath>$(HOME)\nuget\packages\log4net\lib\net40-full\log4net.dll</HintPath>
+	</Reference>-->
+    <!--<Reference Include="gkeyfile-sharp"/>-->
+    <!--<Reference Include="ini-parser">
+	  <HintPath>$(HOME)\nuget\packages\ini-parser\lib\INIFileParser.dll</HintPath>
+    </Reference>-->
+    <!--<Reference Include="Introfs.Util"/>-->
+    <!--<ProjectReference Include="$(ParentProjectDir)..\common\Introfs.Util.*proj">
+      <Project>{7d0fd0f6-1553-4df1-a6fc-1052aba961c7}</Project>
+      <Name>Introfs.Util</Name>
+    </ProjectReference>-->
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe' "
+      Include="**\*.cs" Exclude="**\App.cs"/>
+    <Compile Condition=" '$(OutputType)' != 'library' And '$(OutputType)' != 'exe' "
+      Include="**\*.cs" Exclude="**\App.cs;**\properties\*.cs"/>
+    <!--<Compile Include="**\App.cs"/>-->
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets"/>
+  <!--<Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets"/>-->
+</Project>

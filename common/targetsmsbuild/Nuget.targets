@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NugetApp Condition=" '$(NugetApp)' == '' ">$(HOME)\bin\nuget.exe</NugetApp>
+  </PropertyGroup>
+  
+  <Target Name="NugetPack" DependsOnTargets="Build">
+    <Exec WorkingDirectory="$(ProjectDir)" IgnoreExitCode="true"
+      Command="$(ExeLauncher) $(NugetApp) pack -packagesdirectory $(HOME)\.nuget\packages -outputdirectory $(ProjectDir)build $(MSBuildProjectFile)"/>
+  </Target>
+  <Target Name="NugetAdd">
+	<ItemGroup>
+	  <NugetPkg Include="$(ProjectDir)build\$(AssemblyName).*.nupkg"/>
+	</ItemGroup>
+    <Exec WorkingDirectory="$(TargetDir)" IgnoreExitCode="true"
+      Command="$(ExeLauncher) $(NugetApp) add -source $(HOME)\.nuget\packages @(NugetPkg->'%(FullPath)', ' ')"/>
+  </Target>
+  <Target Name="NugetInstall">
+	<PropertyGroup>
+	  <PackageSpec Condition=" '$(PackageSpec)' == '' ">$(AssemblyName)</PackageSpec>
+	</PropertyGroup>
+    <Exec WorkingDirectory="$(TargetDir)" IgnoreExitCode="true"
+      Command="$(ExeLauncher) $(NugetApp) install -source $(HOME)\.nuget\packages -framework net45 -excludeversion -o $(HOME)\nuget\packages $(PackageSpec)"/>
+  </Target>
+</Project>

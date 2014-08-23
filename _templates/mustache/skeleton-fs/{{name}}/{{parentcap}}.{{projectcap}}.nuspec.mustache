@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>{{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}</id>
+    <version>{{version}}{{^version}}0.1.0{{/version}}</version>
+    <title>{{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}</title>
+    <authors>{{author}}{{^author}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}{{/author}}</authors>
+    <!--<licenseUrl>file:///LICENSE</licenseUrl>-->
+    <licenseUrl>https://opensource.org/licenses/{{license}}{{^license}}Apache-2.0{{/license}}
+      </licenseUrl>
+    <projectUrl>https://{{repohost}}{{^repohost}}bitbucket.org{{/repohost}}/{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}/{{parent}}{{^parent}}introfs{{/parent}}</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>{{description}}{{^description}}Utilities sub-package for FSharp Intro examples project.{{/description}}</description>
+    <releaseNotes>Summary of changes made in this release of the package -- none.</releaseNotes>
+    <copyright>Copyright (c) {{year}}{{^year}}2014{{/year}}, {{author}}{{^author}}{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}{{/author}}</copyright>
+    <language>en-US</language>
+    <tags>demo intro development {{project}}{{^project}}util{{/project}}</tags>
+    <dependencies>
+      <dependency id="fscheck.nunit" version="1.0.0"/>
+      <dependency id="nunit.addinsdependencies" version="2.6.3"/>
+      <!--<dependency id="fscheck.xunit" version="1.0.0"/>-->
+      <!--<dependency id="xunit.runners" version="1.9.2"/>-->
+      <dependency id="fsunit" version="1.3.0.1"/>
+      <!--<dependency id="fsunit.xunit" version="1.3.0.1"/>-->
+      <dependency id="mono.options" version="1.1.0"/>
+      <!--<dependency id="log4net" version="2.0.3"/>-->
+      <!--<dependency id="gkeyfile-sharp" version="0.1"/>-->
+      <dependency id="ini-parser" version="1.7.1"/>
+      {{#executable}}
+      <dependency id="newtonsoft.json" version="6.0.4"/>
+      <dependency id="yamldotnet" version="3.0.0"/>
+      {{/executable}}
+      <!--<dependency id="{{parent}}{{^parent}}introfs{{/parent}}.util" version="0.1.0"/>-->
+    </dependencies>
+  </metadata>
+  <!--<files>
+    <file src="build\bin\$configuration$\$id$.FSharp.*" target="lib\net45"/>
+    <file src="build\bin\$configuration$\$id$.CSharp.*" target="lib\net45"/>
+  </files>-->
+</package>

@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>Introfs.Util</id>
+    <version>0.1.0</version>
+    <title>Introfs.Util</title>
+    <authors>thebridge0491</authors>
+    <!--<licenseUrl>file:///LICENSE</licenseUrl>-->
+    <licenseUrl>https://opensource.org/licenses/Apache-2.0
+      </licenseUrl>
+    <projectUrl>https://bitbucket.org/thebridge0491/introfs</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Utilites sub-package for FSharp Intro examples project.</description>
+    <releaseNotes>Summary of changes made in this release of the package -- none.</releaseNotes>
+    <copyright>Copyright (c) 2014, thebridge0491</copyright>
+    <language>en-US</language>
+    <tags>demo intro development util</tags>
+    <dependencies>
+      <dependency id="fscheck.nunit" version="1.0.0"/>
+      <dependency id="nunit.addinsdependencies" version="2.6.3"/>
+      <!--<dependency id="fscheck.xunit" version="1.0.0"/>-->
+      <!--<dependency id="xunit.runners" version="1.9.2"/>-->
+      <dependency id="fsunit" version="1.3.0.1"/>
+      <!--<dependency id="fsunit.xunit" version="1.3.0.1"/>-->
+      <dependency id="mono.options" version="1.1.0"/>
+      <!--<dependency id="log4net" version="2.0.3"/>-->
+      <!--<dependency id="gkeyfile-sharp" version="0.1"/>-->
+      <dependency id="ini-parser" version="1.7.1"/>
+      <!--<dependency id="introfs.util" version="0.1.0"/>-->
+    </dependencies>
+  </metadata>
+  <!--<files>
+    <file src="build\bin\$configuration$\$id$.FSharp.*" target="lib\net45"/>
+    <file src="build\bin\$configuration$\$id$.CSharp.*" target="lib\net45"/>
+  </files>-->
+</package>

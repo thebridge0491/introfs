@@ -1,0 +1,17 @@
+# Notes: rule R ; assembly A ; namespace N ; type T ; method M
+#  wildcard * ONLY allowed for assembly
+#  example (ignore rule for namespace specified): 
+#  R: Gendarme.Rules.Performance.AvoidConcatenatingCharsRule
+#  N: NDesk.Options
+
+R: Gendarme.Rules.Naming.UseCorrectCasingRule
+A: *
+
+R: Gendarme.Rules.Maintainability.VariableNamesShouldNotMatchFieldNamesRule
+A: *
+
+R: Gendarme.Rules.Naming.ParameterNamesShouldMatchOverriddenMethodRule
+A: *
+
+R: Gendarme.Rules.Performance.UseStringEmptyRule
+A: *

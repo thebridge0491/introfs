@@ -1,0 +1,70 @@
+namespace {{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}.Tests
+    
+open System
+open System.IO
+open Xunit
+open FsUnit.Xunit
+
+open {{parentcap}}{{^parentcap}}Introfs{{/parentcap}}.{{projectcap}}{{^projectcap}}Util{{/projectcap}}
+
+type TcNewCls () = 
+    inherit Base.ClsBase ()
+    
+    let (epsilon) = (0.001f)  //(1.20e-7)
+    
+    do
+        base.SetUp()
+        //fprintfn this.output "SetUp"
+    
+    member this.d = Base.Misc.getdisposable (fun () ->
+        //fprintf this.output "Dispose(%A) / " <| this.GetType()
+        ())
+    interface System.IDisposable with
+        member this.Dispose () = 
+            //fprintfn this.output "TearDown"
+            this.d.Dispose () ; base.d.Dispose ()
+    
+    member this.MarkFunc(stage, funcNm) =
+        //fprintfn this.output "%s(%A.%s)" stage (this.GetType()) funcNm
+        ()
+    
+    [<Fact>] [<Trait("Category", "Tag1")>]
+    member this.MethodTest () = 
+        this.WrapTest((fun () -> this.MarkFunc("SetUp", "MethodTest")),
+            (fun () -> this.MarkFunc("TearDown", "MethodTest")),
+            (fun () -> 
+                //Assert.Equal(2 * 2, 4))
+                4 |> should equal (2 * 2)))
+    
+    [<Fact>] [<Trait("Category", "Tag1")>]
+    member this.FloatTest () = 
+        //Assert.True(Library.inEpsilon(epsilon * 4.0, 4.0, 4.0))
+        4.0f |> should (equalWithin <| 4.0f * epsilon) 4.0f
+    
+    [<Fact>] [<Trait("Category", "Tag1")>]
+    member this.StringTest () = 
+        let (str1, str2) = ("Hello", "hello") in
+        //Assert.True(str1.Equals(str2, StringComparison.OrdinalIgnoreCase))
+        0 |> should equal <| String.Compare(str1, str2, 
+            StringComparison.OrdinalIgnoreCase)
+    
+    [<Fact>] [<Trait("Category", "Tag2")>]
+    member this.BadTest () = 
+        //Assert.Equal(4, 5)
+        5 |> should equal 4
+    
+    [<Fact>] [<Trait("Category", "Tag2")>]
+    member this.FailedTest () = 
+        //Assert.True(false)
+        false |> should equal true
+    
+    [<Fact(Skip="ignored test")>] [<Trait("Category", "Tag2")>]
+    member this.IgnoredTest () = 
+        //raise (Exception()) |> ignore
+        (fun () -> raise (Exception())) |> should throw typeof<Exception>
+    
+    [<Fact>]
+    member this.ExpectAnException () = 
+        //raise (InvalidOperationException()) |> ignore
+        (fun () -> raise (InvalidOperationException()) |> ignore) |> 
+            should throw typeof<InvalidOperationException>

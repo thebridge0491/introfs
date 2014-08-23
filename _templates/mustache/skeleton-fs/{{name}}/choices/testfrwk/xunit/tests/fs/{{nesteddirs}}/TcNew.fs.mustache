@@ -1,0 +1,58 @@
+namespace {{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}.Tests
+    
+open System
+open Xunit
+open FsUnit.Xunit
+
+open {{parentcap}}{{^parentcap}}Introfs{{/parentcap}}.{{projectcap}}{{^projectcap}}Util{{/projectcap}}
+
+module TcNew =
+    
+    let (modNm, epsilon) = ("TcNew", 0.001)
+    
+    let wrapTest startFun endFun testFun =
+        startFun () ; testFun () ; endFun ()
+    
+    let markFunc stage funcNm =
+        printf "%s(%s.%s)" stage modNm funcNm
+    
+    [<Fact>] [<Trait("Category", "Tag1")>]
+    let ``funcTest`` () = 
+        wrapTest (fun () -> markFunc "SetUp" "funcTest")
+            (fun () -> markFunc "TearDown" "funcTest")
+            (fun () -> 
+                //Assert.Equal(2 * 2, 4))
+                4 |> should equal (2 * 2))
+    
+    [<Fact>] [<Trait("Category", "Tag1")>]
+    let ``floatTest`` () = 
+        //Assert.True(Library.inEpsilon (epsilon * 4.0) 4.0 4.0)
+        4.0 |> should (equalWithin <| 4.0 * epsilon) 4.0
+    
+    [<Fact>] [<Trait("Category", "Tag1")>]
+    let ``stringTest`` () = 
+        let (str1, str2) = ("Hello", "hello") in
+        //Assert.True(str1.Equals(str2, StringComparison.OrdinalIgnoreCase))
+        0 |> should equal <| String.Compare(str1, str2, 
+            StringComparison.OrdinalIgnoreCase)
+    
+    [<Fact>] [<Trait("Category", "Tag2")>]
+    let ``badTest`` () = 
+        //Assert.Equal(4, 5)
+        5 |> should equal 4
+    
+    [<Fact>] [<Trait("Category", "Tag2")>]
+    let ``failedTest`` () = 
+        //Assert.True(false)
+        false |> should equal true
+    
+    [<Fact(Skip="ignored test")>] [<Trait("Category", "Tag2")>]
+    let ``ignoredTest`` () = 
+        //raise (Exception()) |> ignore
+        (fun () -> raise (Exception())) |> should throw typeof<Exception>
+    
+    [<Fact>]
+    let ``expectAnException`` () = 
+        //raise (InvalidOperationException()) |> ignore
+        (fun () -> raise (InvalidOperationException()) |> ignore) |> 
+            should throw typeof<InvalidOperationException>

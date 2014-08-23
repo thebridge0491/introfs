@@ -1,0 +1,10 @@
+package=Newtonsoft.Json
+exec_prefix=${pcfiledir}/../..
+libdir=${exec_prefix}/lib
+assemblies_dir=${libdir}/mono/${package}
+Libraries=${assemblies_dir}/${package}.dll
+
+Name: Json.NET
+Description: Json.NET - JSON framework for .NET
+Version: 6.0.4
+Libs: -r:${Libraries}

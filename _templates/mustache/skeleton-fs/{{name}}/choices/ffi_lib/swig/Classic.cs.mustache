@@ -1,0 +1,46 @@
+namespace {{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}} {
+
+using System;
+
+/// <summary>Classic class.</summary>
+public class Classic {
+    /// <summary>Computes factorial (loop version).</summary>
+    /// <param name="n">A long</param>
+    /// <returns>The factorial of number.</returns>
+	public static long FactLp(long n) { return ClassicC.fact_lp((int)n); }
+
+    /// <summary>Computes factorial (iterative version).</summary>
+    /// <param name="n">A long</param>
+    /// <returns>The factorial of number.</returns>
+	public static long FactI(long n) { return ClassicC.fact_i((int)n); }
+
+    /// <summary>Computes n-th exponent of base.(loop version).</summary>
+    /// <param name="b">A float</param>
+    /// <param name="n">A float</param>
+    /// <returns>The n-th exponent of base.</returns>
+	public static float ExptLp(float b, float n)
+	{
+		return ClassicC.expt_lp(b, n);
+	}
+
+    /// <summary>Computes n-th exponent of base.(iterative version).</summary>
+    /// <param name="b">A float</param>
+    /// <param name="n">A float</param>
+    /// <returns>The n-th exponent of base.</returns>
+	public static float ExptI(float b, float n)
+	{
+		return ClassicC.expt_i(b, n);
+	}
+	
+	/// <summary>Main entry point.</summary>
+    /// <param name="args">An array</param>
+    /// <returns>The exit code.</returns>
+	public static int Main(string[] args)
+    {
+		long n = 5;
+		Console.Write("Fact({0}) : {1}\n", n, FactI(n));
+		return 0;
+	}
+}
+
+}

@@ -1,0 +1,17 @@
+%module ClassicC
+
+%{
+#include <stdlib.h>
+#include "intro_c/classic.h"
+%}
+
+%include "intro_c/classic.h"
+//extern unsigned long fact_i(const unsigned int n);
+//extern unsigned long fact_lp(const unsigned int n);
+
+//extern float expt_i(const float b, const float n);
+//extern float expt_lp(const float b, const float n);
+
+// swig -csharp -v -I$(PREFIX)/include -namespace {{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}} -dllimport {{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}_stubs -outdir src/cs/{{nesteddirs}}{{^nesteddirs}}introfs/util{{/nesteddirs}} -o build/ClassicC.c ClassicC.i
+// sed -i '' 's/CSharp_//g' src/cs/{{nesteddirs}}{{^nesteddirs}}introfs/util{{/nesteddirs}}/ClassicCPINVOKE.cs
+// sed -i '' 's/CSharp_//g' build/ClassicC.c
