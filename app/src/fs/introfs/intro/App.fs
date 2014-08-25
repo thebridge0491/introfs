@@ -31,9 +31,23 @@ namespace Introfs.Intro
 open System
 open System.Diagnostics
 open System.Reflection
+open Newtonsoft.Json
+
+open Introfs.Practice
+open Introfs.Intro
 
 type OptsRecord =
-    {mutable Name: string}
+    {mutable Name: string ; mutable Num : int ; mutable IsExpt2 : bool}
+
+type ConstItems = ZERO = 0 | NUMZ = 26
+type Kind = FLOAT | DOUBLE | DECIMAL | SH | UINT
+
+// discriminated union
+type UVar =
+    |   Short of kind : Kind * value : int8
+    |   ULong of kind : Kind * value : uint64
+    |   Double of kind : Kind * value : float
+    |   Float of kind : Kind * value : float32
 
 type Defn =
     {Hostname: string; Domain: string; File1: PathExt; User1: NameAge}
@@ -59,8 +73,13 @@ type YamlConfig () =
 /// <summary>App module.</summary>
 module App =
     
-    let defaultOptsRecord : OptsRecord = {Name = "John"} in
+    module Util = Introfs.Util.Library
+    module Seqops = Sequenceops
     
+    let defaultOptsRecord : OptsRecord = {Name = "John"; Num = 0; 
+        IsExpt2 = false} in
+    (*let defaultUser : User = {Name = "John"; Num = 0; 
+        TimeIn = System.DateTime.Now} in*)
     let log = log4net.LogManager.GetLogger "root" in
     
     let assembly = Assembly.GetExecutingAssembly () in
@@ -69,11 +88,72 @@ module App =
     //let progName = Environment.GetCommandLineArgs().[0] in
     let progName = IO.Path.GetFileName(Environment.GetCommandLineArgs().[0]) in
     
-    let runIntro (name: string) =
+    let runIntro (rsrcPath: string) (optsRec: OptsRecord) =
+        let (time1, stopwatch1) = (DateTime.Now, new Diagnostics.Stopwatch()) in
+        let (_, greetPath) = (stopwatch1.Start (), "greet.txt") in
+        let (ch, delayMSecs, seedp) = ('\000', 2500, time1.Millisecond) in
+        let mutable uVar1 : UVar = Short(kind = Kind.SH, value = 100y) in
+        (*let user1 = {defaultUser with Name = optsRec.Name; Num = optsRec.Num} in*)
+        let mutable user1 = User(Name = optsRec.Name, Num = optsRec.Num) in
+        let (pers1, lst) = (Person("I.M. Computer", 32), [2; 1; 0; 4; 3]) in
+        let strLst = Util.mkString (fun e -> sprintf "%d" e) lst in
+        let rnd = new Random(seedp) in
+        let (numVal, numArr) = (ref 0, [|0b1011; 0o13; 0xb; 11|]) in
+        let tz1 = TimeZone.CurrentTimeZone in
+        let tzStr = 
+            if tz1.IsDaylightSavingTime(time1) then tz1.DaylightName
+            else tz1.StandardName in
         let rec pat = @"(?i)quit" 
-            and m = Text.RegularExpressions.Regex.Match(name, pat) in
+            and m = Text.RegularExpressions.Regex.Match(optsRec.Name, pat) in
+        
+        numVal := Array.fold (+) 0 numArr
+        assert ((!numVal) = numArr.Length * numArr.[0])
+        
+        Library.delayChar (fun () -> Threading.Thread.Sleep(delayMSecs)) |> ignore
+        
+        uVar1 <- ULong(kind = Kind.UINT, value = 1UL)
+        uVar1 <- Float(kind = Kind.FLOAT, value = 1000.0f)
+        uVar1 <- Double(kind = Kind.DOUBLE, value = 100.0)
+        assert (match uVar1 with
+                | Double (kind, value) -> Kind.DOUBLE = kind && 100.0 = value
+                | _ -> false)
+        
+        user1.Num <- (if 0 = user1.Num then rnd.Next(0, 18) + 2 else user1.Num)
+                
         printfn "%s match: %s to %s" (if m.Success then "Good" else "Does not")
-            pat name
+            pat optsRec.Name
+        
+        printfn "%s %s\n%s!" (time1.ToString("ddd MMM dd HH:mm:ss yyyy zzz"))
+            tzStr <| Library.greeting rsrcPath greetPath (user1.Name)
+        stopwatch1.Stop ()
+        printfn "(program %s) Took %.2f seconds." progName (float 
+            (stopwatch1.ElapsedMilliseconds) * 1.0e-3)
+        
+        if optsRec.IsExpt2 then
+            printfn "expt 2.0 %.1f: %.1f" (float32 user1.Num) <|
+                Classic.exptI 2.0f (float32 user1.Num)
+            printfn "rev %s: %s" strLst 
+                (Util.mkString (fun e -> sprintf "%d" e) <| Seqops.revSeqI lst)
+            printfn "List.sortWith <lambda> %s: %s" strLst 
+                (Util.mkString (fun e -> sprintf "%d" e) <|
+                    List.sortWith (fun a b -> compare b a) lst)
+        else
+            printfn "fact %d: %d" user1.Num <| Classic.factI (int64 user1.Num)
+            printfn "findIndex <lambda> %s: %A" strLst <|
+                Seqops.findIndexSeqI (fun e -> e = 3) lst
+            printfn "List.append %s %s: %s" strLst
+                (Util.mkString (fun e -> sprintf "%d" e) [9; 9; 9; 9;])
+                (Util.mkString (fun e -> sprintf "%d" e) <| lst @ [9; 9; 9; 9;])
+        
+        printfn "%s" (String.replicate 40 "#")
+        assert (pers1.GetType().Equals typeof<Person>)
+        assert (pers1.Equals pers1)
+        printfn "person1.ToString: %s" (pers1.ToString ())
+        printfn "person1.Age: %d" pers1.Age
+        pers1.Age <- 33
+        printfn "person1.Age <- %d" 33
+        printfn "person1.ToString: %s" (pers1.ToString ())
+        printfn "%s" (String.replicate 40 "#")
     
     let parseCmdopts (args: string[]) (options: Mono.Options.OptionSet) = 
         let extra = ref (new Collections.Generic.List<string>()) in
@@ -94,6 +174,8 @@ module App =
         let optsRec = {defaultOptsRecord with Name = "World"} in
         let options = new Mono.Options.OptionSet() in
         ["u|user=", "user name", (fun v -> optsRec.Name <- string v)
+            ; "n|num=", "number", (fun v -> optsRec.Num <- int v)
+            ; "2|expt2", "expt 2 n", (fun v -> optsRec.IsExpt2 <- true)
             ; "h|help",  "show this message", (fun v -> 
                 eprintfn "Usage: %s [options]\n\nOptions:" progName
                 options.WriteOptionDescriptions Console.Out
@@ -124,10 +206,10 @@ module App =
         | exc0 -> 
             printfn "(exc: %s) Bad env var RSRC_PATH: %s\n" (exc0.ToString ()) rsrcPath
             try
-                iniStr := Library.getFromResources "prac.conf" null
-                jsonStr := Library.getFromResources "prac.json" <|
+                iniStr := Util.getFromResources "prac.conf" null
+                jsonStr := Util.getFromResources "prac.json" <|
                     (assembly.GetType ()).Namespace + ".resources"
-                yamlStr := Library.getFromResources "prac.yaml" null
+                yamlStr := Util.getFromResources "prac.yaml" null
             with
             | exc1 ->
                 reraise ()
@@ -136,7 +218,7 @@ module App =
         //let cfgIni = new KeyFile.GKeyFile() in
         //cfgIni.LoadFromData (!iniStr)
         let cfgIni = (new IniParser.StringIniParser()).ParseString(!iniStr) in
-        
+        (*
         let defaultDefn : Defn = {
             Hostname = ""; Domain = ""; File1 = {Path = ""; Ext = ""}; 
             User1 = {Name = ""; Age = 0} } in
@@ -150,31 +232,31 @@ module App =
         let deserializer = new YamlDotNet.Serialization.Deserializer () in
         let dictRootYaml = deserializer.Deserialize<YamlConfig>(
             new IO.StringReader (!yamlStr)) in
-        
+        *)
         let arrTups = [|
-            //(Library.iniCfgToStr cfgIni
+            //(Util.iniCfgToStr cfgIni
             //    , cfgIni.GetValue("default", "domain")
             //    , cfgIni.GetValue("user1", "name"))
-            (Library.iniCfgToStr cfgIni
+            (Util.iniCfgToStr cfgIni
                 , cfgIni.["default"].["domain"]
                 , cfgIni.["user1"].["name"])
-            ; (anonType.ToString ()
+            (* ; (anonType.ToString ()
                 , anonType.Domain
                 , anonType.User1.Name)
-            ; (Library.mkStringInit ("map [", "; ", "]") string <| 
+            ; (Util.mkStringInit ("map [", "; ", "]") string <| 
                     Map.toSeq mapRootJson
                 , mapRootJson.["domain"].ToString ()
                 , mapUserJson.["name"].ToString ())
             ; (!yamlStr
                 , dictRootYaml.domain
-                , dictRootYaml.user1.name)
+                , dictRootYaml.user1.name) *)
             |] in
         Array.iter (fun (t0, t1, t2) -> 
             printfn "config: %s" t0
             printfn "domain: %s" t1
             printfn "user1Name: %s\n" t2) arrTups
         
-        runIntro optsRec.Name
+        runIntro rsrcPath optsRec
         
         //Trace.Fail "Trace example"
         Trace.Flush () //Debug.Flush ()

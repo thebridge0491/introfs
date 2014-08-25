@@ -5,11 +5,10 @@ open System.Linq
 open NUnit.Framework
 open FsCheck
 
-open Introfs.Intro
-
 [<TestFixture>]
 module TpNew =
     
+    module Util = Introfs.Util.Library
     type PropertyAttribute = FsCheck.NUnit.PropertyAttribute
     type MyArbitraries = Base.MyArbitraries
     
@@ -28,7 +27,7 @@ module TpNew =
     let ``assocAddCheck`` () = 
         let func (x: int) (y: int) (z: int) = 
             let (a, b, c) = (float x, float y, float z) in
-            Library.inEpsilon (epsilon * ((a + b) + c)) ((a + b) + c) (a + (b + c)) in
+            Util.inEpsilon (epsilon * ((a + b) + c)) ((a + b) + c) (a + (b + c)) in
         (*Fluent.Spec.ForAny<int, int, int>(func
             ).QuickCheckThrowOnFailure()*)
         Check.QuickThrowOnFailure func
@@ -63,7 +62,7 @@ module TpNew =
     let ``minSortHeadCheckA`` () = 
         let func (xs: NonEmptyArray<NormalFloat>) = 
             let ys = (xs.Get) |> Array.map (fun e -> e.Get) |> Array.sort in
-            Library.inEpsilon (epsilon * ys.[0]) ys.[0] (Array.min xs.Get).Get in
+            Util.inEpsilon (epsilon * ys.[0]) ys.[0] (Array.min xs.Get).Get in
         (*Fluent.Spec.ForAny<NonEmptyArray<NormalFloat>>(func).QuickCheckThrowOnFailure()*)
         Check.QuickThrowOnFailure func
     
@@ -71,7 +70,7 @@ module TpNew =
     let ``minSortHeadCheckB`` () = 
         let func (xs: seq<float>) = 
             let item0 = Seq.item 0 <| Seq.sort xs in
-            Library.inEpsilon (epsilon * item0) item0 (Seq.min xs) in
+            Util.inEpsilon (epsilon * item0) item0 (Seq.min xs) in
         (*Fluent.DefaultArbitraries.Add<MyArbitraries> () |> ignore ;
         Fluent.Spec.ForAny<seq<float>>(func).QuickCheckThrowOnFailure()*)
         Arb.register<MyArbitraries> () |> ignore ;
@@ -85,7 +84,7 @@ module TpNew =
     [<Property>] [<Category("Tag3")>]
     let ``assocAddProp`` (x: int) (y: int) (z: int) = 
         let (a, b, c) = (float x, float y, float z) in
-        Library.inEpsilon (epsilon * ((a + b) + c)) ((a + b) + c) (a + (b + c))
+        Util.inEpsilon (epsilon * ((a + b) + c)) ((a + b) + c) (a + (b + c))
     
     [<Property>] [<Category("Tag3")>]
     let ``revRevProp`` (xs: int[]) = 
@@ -105,9 +104,9 @@ module TpNew =
     [<Property>] [<Category("Tag3")>]
     let ``minSortHeadPropA`` (xs: NonEmptyArray<NormalFloat>) = 
         let ys = xs.Get |> Array.map (fun e -> e.Get) |> Array.sort in
-        Library.inEpsilon (epsilon * ys.[0]) ys.[0] (Array.min xs.Get).Get
+        Util.inEpsilon (epsilon * ys.[0]) ys.[0] (Array.min xs.Get).Get
     
     [<Property(Arbitrary = [| typeof<MyArbitraries> |])>] [<Category("Tag3")>]
     let ``minSortHeadPropB`` (xs: seq<float>) = 
         let item0 = Seq.item 0 <| Seq.sort xs in
-        Library.inEpsilon (epsilon * item0) item0 (Seq.min xs)
+        Util.inEpsilon (epsilon * item0) item0 (Seq.min xs)

@@ -20,7 +20,7 @@ type Person(name0: string, age0: int) =
     member this.Age 
         with get() = age
         and set(value) = age <- value
-    
+    (*
     interface System.IEquatable<Person> with
         member this.Equals (other: Person) =
             match isNull other with
@@ -31,6 +31,15 @@ type Person(name0: string, age0: int) =
     override this.Equals other =
         match other with
         | :? Person as p -> this.Equals p
+        | _ -> false
+    *)
+    /// <inheritdoc/>
+    override this.Equals other =
+        match other with
+        | :? Person as p -> 
+            match isNull p with
+            | true -> false
+            | _ -> (name, age) = (p.Name, p.Age)
         | _ -> false
     
     /// <inheritdoc/>

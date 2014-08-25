@@ -1,0 +1,10 @@
+package=YamlDotNet
+exec_prefix=${pcfiledir}/../..
+libdir=${exec_prefix}/lib
+assemblies_dir=${libdir}/mono/${package}
+Libraries=${assemblies_dir}/${package}.dll
+
+Name: YamlDotNet
+Description: YamlDotNet - A .NET library for YAML
+Version: 3.0.0
+Libs: -r:${Libraries}

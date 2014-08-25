@@ -4,10 +4,10 @@ open System
 open NUnit.Framework
 open FsUnit
 
-open Introfs.Intro
-
 [<TestFixture>]
 module TcNew =
+    
+    module Util = Introfs.Util.Library
     
     let (modNm, epsilon) = ("TcNew", 0.001)
     
@@ -47,7 +47,7 @@ module TcNew =
         //Assert.AreEqual(4.0, 4.0, "Floats")
         //Assert.That(4.0, Is.EqualTo(4.0).Within(4.0 * epsilon), 
         //        "Floats constraint-based")
-        //Assert.True(Library.inEpsilon * epsilon * 4.0f) 4.0f 4.0f)
+        //Assert.True(Util.inEpsilon * epsilon * 4.0f) 4.0f 4.0f)
         4.0 |> should (equalWithin <| 4.0 * epsilon) 4.0
     
     [<Test>] [<Category("Tag1")>]

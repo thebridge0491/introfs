@@ -7,7 +7,7 @@
     <!--<RootNamespace>Introfs</RootNamespace>-->
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
     <!--<OutputType Condition=" '$(OutputType)' == '' ">library</OutputType>-->
-    <SUBPROJS Condition=" '$(SUBPROJS)' == '' ">common\*.*proj;app\*.*proj</SUBPROJS>
+    <SUBPROJS Condition=" '$(SUBPROJS)' == '' ">common\*.*proj;foreignc\*.*proj;api\*.*proj;app\*.*proj</SUBPROJS>
     <ProjectVersion Condition=" '$(ProjectVersion)' =='' ">0.1.0</ProjectVersion>
     <DistTargets Condition=" '$(DistTargets)' == '' ">DistTar;DistZip</DistTargets>
     <TAREXT Condition=" '$(TAREXT)' == '' ">tar.gz</TAREXT>

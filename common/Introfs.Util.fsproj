@@ -101,22 +101,6 @@
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets"/>
   <Import Project="targetsmsbuild\Tools.*.targets"/>
   <Import Project="targetsmsbuild\Nuget.targets"/>
-  
-  <!-- To combine same language products (assemblies Or netmodules): -->
-  <!--
-  <ItemGroup Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe' ">
-    <OtherAssemblies Include="$(TargetDir)$(AssemblyName)*.exe"/>
-    <OtherAssemblies Include="$(TargetDir)$(AssemblyName)*.dll"/>
-  </ItemGroup>
-  <PropertyGroup>
-    <SourcesAssyInfo>src\cs\properties\AssemblyInfo.cs</SourcesAssyInfo>
-  </PropertyGroup>
-  <ItemGroup Condition=" '$(OutputType)' != 'library' And '$(OutputType)' != 'exe' ">
-    <AddModules Include="$(TargetDir)$(AssemblyName)*.netmodule"/>
-  </ItemGroup>
-  <Import Project="targetsmsbuild\CombineProducts.targets"/>
-  -->
-  
   <!-- To modify your build process, add your task inside one of the targets
       below and uncomment it. Other similar extension points exist, see
       Microsoft.Common.targets. -->
@@ -135,13 +119,6 @@
     <Exec WorkingDirectory="$(ProjectDir)" IgnoreExitCode="true"
         Command="gacutil -root $(HOME)\.local\lib -package Mono.Options -i $(TargetDir)Mono.Options.dll"/>
   </Target>
-  <!--<Target Name="AuxFfi" DependsOnTargets="PrepareForBuild">
-    <PropertyGroup>
-      <MAKECMD Condition=" '$(MAKECMD)' == '' ">make</MAKECMD>
-    </PropertyGroup>
-    <Exec WorkingDirectory="$(ProjectDir)" IgnoreExitCode="true"
-        Command="$(MAKECMD) -B -f Makefile-auxffi.mk auxffi"/>
-  </Target>-->
   <!--<Target Name="Help" DependsOnTargets="PrepareForBuild">
     <Message Importance="High" Text="Visual Studio Version: $(VisualStudioVersion)"/>
     <Message Importance="High" Text="MS Build Bin Path: $(MSBuildBinPath)"/>
