@@ -103,6 +103,8 @@ module App =
         let tzStr = 
             if tz1.IsDaylightSavingTime(time1) then tz1.DaylightName
             else tz1.StandardName in
+        let answer = ClassicPuzzles.nqueens 8 in
+        let queensNdx = rnd.Next(0, List.length answer) in
         let rec pat = @"(?i)quit" 
             and m = Text.RegularExpressions.Regex.Match(optsRec.Name, pat) in
         
@@ -133,17 +135,42 @@ module App =
             printfn "expt 2.0 %.1f: %.1f" (float32 user1.Num) <|
                 Classic.exptI 2.0f (float32 user1.Num)
             printfn "rev %s: %s" strLst 
-                (Util.mkString (fun e -> sprintf "%d" e) <| Seqops.revSeqI lst)
+                (Util.mkString (fun e -> sprintf "%d" e) <| Seqops.revI lst)
             printfn "List.sortWith <lambda> %s: %s" strLst 
                 (Util.mkString (fun e -> sprintf "%d" e) <|
                     List.sortWith (fun a b -> compare b a) lst)
         else
             printfn "fact %d: %d" user1.Num <| Classic.factI (int64 user1.Num)
             printfn "findIndex <lambda> %s: %A" strLst <|
-                Seqops.findIndexSeqI (fun e -> e = 3) lst
+                Option.get (Seqops.findIndexI (fun e -> e = 3) lst)
             printfn "List.append %s %s: %s" strLst
                 (Util.mkString (fun e -> sprintf "%d" e) [9; 9; 9; 9;])
                 (Util.mkString (fun e -> sprintf "%d" e) <| lst @ [9; 9; 9; 9;])
+        
+        printfn "%s" (String.replicate 40 "#")
+        printfn "pascaltri %d: %s\n" 5 (Util.mkString
+            (fun xs -> Util.mkString string xs) (Classic.pascaltriAdd 5))
+        printfn "%s" <| Util.mkStringNested ("", "", "")
+            (fun xs -> Util.mkStringInit (" ", " ", "\n") string xs)
+            (Classic.pascaltriAdd 5)
+        
+        printfn "%s" (String.replicate 40 "#")
+        printfn "hanoiMoves (%d, %d %d) %d: %s\n" 1 2 3 4
+            (Util.mkString (fun (p1, p2) -> Printf.sprintf "(%d, %d)" p1 p2)
+            (match ClassicPuzzles.hanoiMoves (1, 2, 3) 4 with
+            | res, _, _ -> res))
+        printfn "%s" <| Util.mkStringInit ("", "\n", "\n")
+            (fun (moves, pegs) -> Printf.sprintf "(%s, %s)" moves (
+                Util.mkString (Util.mkString string) pegs))
+                (match ClassicPuzzles.hanoiMoves (1, 2, 3) 4 with
+                | _, _, mov -> mov)
+        
+        printfn "%s" (String.replicate 40 "#")
+        printfn "nqueensGrid %d answer: %s\n" 8 (Util.mkString (fun (h, t) ->
+            Printf.sprintf "(%d, %d)" h t) (List.item queensNdx answer))
+        printfn "%s" <| Util.mkStringNested ("", "", "") (fun xs -> 
+            Util.mkStringInit (" ", "-", "-\n") string xs)
+            (ClassicPuzzles.nqueensGrid 8 (List.item queensNdx answer))
         
         printfn "%s" (String.replicate 40 "#")
         assert (pers1.GetType().Equals typeof<Person>)
