@@ -10,6 +10,7 @@ open Introfs.Practice
 module TpClassic =
     
     module Util = Introfs.Util.Library
+    module ClassicHi = ClassicHiorder
     type PropertyAttribute = FsCheck.NUnit.PropertyAttribute
     
     let (modNm, epsilon) = ("TpClassic", 0.001)
@@ -37,7 +38,8 @@ module TpClassic =
         let ans = float <| n ** 2.0f in
         Seq.fold (fun acc fn ->
             acc && (Util.inEpsilon (epsilon * ans) ans (float <| fn n))) true
-            [Classic.squareR; Classic.squareI]
+            [Classic.squareR; Classic.squareI; ClassicHi.squareF
+                ; ClassicHi.squareU; ClassicHi.squareLc]
     
     [<Property>] [<Category("Tag3")>]
     let ``exptProp`` (x: uint32) (y: uint32) =
@@ -46,7 +48,8 @@ module TpClassic =
         Seq.fold (fun acc fn -> 
             acc && (Util.inEpsilon (epsilon * ans) ans (float <| fn b n))) true
             [Classic.exptR; Classic.exptI; Classic.fastExptR
-                ; Classic.fastExptI; curry ClassicCs.ExptLp
+                ; Classic.fastExptI; ClassicHi.exptF; ClassicHi.exptU
+                ; ClassicHi.exptLc; curry ClassicCs.ExptLp
                 ; curry ClassicCs.ExptI]
     
     [<Property>]
@@ -57,14 +60,16 @@ module TpClassic =
             |   _ -> 0L in
         Seq.fold (fun acc fn ->
             acc && ans.Equals (fn hi lo)) true
-            [Classic.sumToR; Classic.sumToI]
+            [Classic.sumToR; Classic.sumToI; ClassicHi.sumToF
+            ; ClassicHi.sumToU; ClassicHi.sumToLc]
     
     [<Property(MaxTest = 20, Verbose = true)>] [<Category("Tag3")>]
     let ``factProp`` (x: uint32) =
         let n = (int64 x) % 19L + 1L in
         let ans = Seq.fold (fun acc e -> acc * e) 1L [1L .. n] in
         Seq.fold (fun acc fn -> acc && ans.Equals (fn n)) true
-            [Classic.factR; Classic.factI; ClassicCs.FactLp; ClassicCs.FactI]
+            [Classic.factR; Classic.factI; ClassicHi.factF; ClassicHi.factU
+                ; ClassicHi.factLc; ClassicCs.FactLp; ClassicCs.FactI]
     
     [<Property>]
     let ``fibProp`` (x:uint32) =
@@ -72,7 +77,8 @@ module TpClassic =
         let ans = snd (Seq.fold (fun (s0, s1) _ -> (s0 + s1, s0)) (0, 1) 
             [0 .. n]) in
         Seq.fold (fun acc fn -> acc && ans.Equals (fn n)) true
-            [Classic.fibR; Classic.fibI]
+            [Classic.fibR; Classic.fibI; ClassicHi.fibF; ClassicHi.fibU
+            ; ClassicHi.fibLc]
     
     [<Property>]
     let ``pascaltriProp`` (x:uint32) =
@@ -84,7 +90,9 @@ module TpClassic =
         Seq.fold (fun a f -> a && validNumRows (f rows) &&
             fst (Seq.fold (fun (a1, n) r -> (a1 && validLenRow n r
             && validSumRow n r, n + 1)) (true, 0) (f rows))) true
-            [Classic.pascaltriMult; Classic.pascaltriAdd]
+            [Classic.pascaltriMult; Classic.pascaltriAdd
+            ; ClassicHi.pascaltriF; ClassicHi.pascaltriU
+            ; ClassicHi.pascaltriLc]
     
     [<Property>]
     let ``quotRemProp`` (x:int32) (y:uint32) =
@@ -114,7 +122,9 @@ module TpClassic =
                         Classic.euclidI a b)) m ms) in
                 List.fold (fun acc (fnG, fnL) -> acc && ansG.Equals (fnG mss) && ansL.Equals (fnL mss)) true
                     [(Classic.gcdR, Classic.lcmR)
-                    ; (Classic.gcdI, Classic.lcmI)]
+                    ; (Classic.gcdI, Classic.lcmI)
+                    ; (ClassicHi.gcdF, ClassicHi.lcmF)
+                    ; (ClassicHi.gcdU, ClassicHi.lcmU)]
         |   _ -> true
     *)
     
@@ -128,7 +138,9 @@ module TpClassic =
                 ([], n) [0 .. (int (log (float n) / log (float b)))]) in
         Seq.fold (fun acc fn ->
             acc && ans.Equals (fn b n)) true
-            [Classic.baseExpandR; Classic.baseExpandI]
+            [Classic.baseExpandR; Classic.baseExpandI
+            ; ClassicHi.baseExpandF; ClassicHi.baseExpandU
+            ; ClassicHi.baseExpandLc]
     
     [<Property>]
     let ``baseTo10Prop`` (nss:uint32 list) =
@@ -141,7 +153,8 @@ module TpClassic =
         Seq.fold (fun acc fn ->
             acc && ansBs2.Equals (fn 2 nssBs2)
             && ansBs16.Equals (fn 16 nssBs16)) true
-            [Classic.baseTo10R; Classic.baseTo10I]
+            [Classic.baseTo10R; Classic.baseTo10I; ClassicHi.baseTo10F
+            ; ClassicHi.baseTo10U; ClassicHi.baseTo10Lc]
     
     [<Property>]
     let ``rangeProp`` (start:int32) (stop:int32) =
@@ -153,7 +166,9 @@ module TpClassic =
             acc && ans.Equals (fnRg start stop)
             && ans.Equals (fnStep 1 start stop)) true
             [(Classic.rangeStepR, Classic.rangeR)
-            ; (Classic.rangeStepI, Classic.rangeI)]
+            ; (Classic.rangeStepI, Classic.rangeI)
+            ; (ClassicHi.rangeStepF, ClassicHi.rangeF)
+            ; (ClassicHi.rangeStepU, ClassicHi.rangeU)]
     
     [<Property>]
     let ``composeProp`` (numI:int32) =

@@ -12,6 +12,7 @@ module TpSequenceops =
     
     module Util = Introfs.Util.Library
     module Seqops = Sequenceops
+    module ListopsHi = ListopsHiorder
     type PropertyAttribute = FsCheck.NUnit.PropertyAttribute
     type MyArbitraries = Base.MyArbitraries
     
@@ -25,7 +26,8 @@ module TpSequenceops =
         Seq.fold (fun acc fn -> acc && ans.SequenceEqual (fn id n)) true
             [Seqops.tabulateR; Seqops.tabulateI]
         && Seq.fold (fun acc fn -> acc && ans.SequenceEqual (fn id n)) true
-            [Listops.tabulateR; Listops.tabulateI]
+            [Listops.tabulateR; Listops.tabulateI; ListopsHi.tabulateF
+            ; ListopsHi.tabulateU; ListopsHi.tabulateLc]
     
     [<Property>]
     let ``lengthProp`` (xs:int list) =
@@ -34,7 +36,8 @@ module TpSequenceops =
         Seq.fold (fun acc fn -> acc && ans = (fn lst)) true
             [Seqops.lengthR; Seqops.lengthI]
         && Seq.fold (fun acc fn -> acc && ans = (fn lst)) true
-            [Listops.lengthR; Listops.lengthI]
+            [Listops.lengthR; Listops.lengthI; ListopsHi.lengthF
+            ; ListopsHi.lengthU]
     
     [<Property>]
     let ``nthProp`` (n:uint32) (xs:int list) =
@@ -45,7 +48,8 @@ module TpSequenceops =
         Seq.fold (fun acc fn -> acc && ans = (fn idx lst)) true
             [Seqops.nthR; Seqops.nthI]
         && Seq.fold (fun acc fn -> acc && ans = (fn idx lst)) true
-            [Listops.nthR; Listops.nthI]
+            [Listops.nthR; Listops.nthI; ListopsHi.nthF; ListopsHi.nthU
+            ; ListopsHi.nthLc]
     
     [<Property>] [<Category("Tag3")>]
     let ``indexFindProp`` (el:int) (xs:int list) =
@@ -60,7 +64,10 @@ module TpSequenceops =
             [(Seqops.findIndexR, Seqops.findR)
                 ; (Seqops.findIndexI, Seqops.findI)
                 ; (Listops.findIndexR, Listops.findR)
-                ; (Listops.findIndexI, Listops.findI)]
+                ; (Listops.findIndexI, Listops.findI)
+                ; (ListopsHi.findIndexF, ListopsHi.findF)
+                ; (ListopsHi.findIndexU, ListopsHi.findU)
+                ; (ListopsHi.findIndexLc, ListopsHi.findLc)]
     
     [<Property>]
     let ``minMaxProp`` (xs:int list) =
@@ -69,7 +76,9 @@ module TpSequenceops =
         Seq.fold (fun acc (fnMin, fnMax) -> acc && (ansMin = (fnMin lst)) &&
             (ansMax = (fnMax lst))) true
             [(Seqops.minR, Seqops.maxR); (Seqops.minI, Seqops.maxI)
-            ; (Listops.minR, Listops.maxR); (Listops.minI, Listops.maxI)]
+            ; (Listops.minR, Listops.maxR); (Listops.minI, Listops.maxI)
+            ; (ListopsHi.minF, ListopsHi.maxF)
+            ; (ListopsHi.minU, ListopsHi.maxU)]
     
     [<Property>] [<Category("Tag3")>]
     let ``reverseProp`` (xs:int list) =
@@ -81,7 +90,7 @@ module TpSequenceops =
         && Seq.fold (fun acc fn -> acc && ans.SequenceEqual (fn xs)) true
             [Seqops.revR; Seqops.revI]
         && Seq.fold (fun acc fn -> acc && ans.SequenceEqual (fn xs)) true
-            [Listops.revR; Listops.revI]
+            [Listops.revR; Listops.revI; ListopsHi.revF; ListopsHi.revU]
     
     [<Property>]
     let ``copyProp`` (xs:int list) =
@@ -91,7 +100,8 @@ module TpSequenceops =
         && Seq.fold (fun acc fn -> acc && ans.SequenceEqual (fn xs)) true
             [Seqops.copyR; Seqops.copyI]
         && Seq.fold (fun acc fn -> acc && ans.SequenceEqual (fn xs)) true
-            [Listops.copyR; Listops.copyI]
+            [Listops.copyR; Listops.copyI; ListopsHi.copyF; ListopsHi.copyU
+            ; ListopsHi.copyLc]
     
     [<Property>]
     let ``takeDropProp`` (num:uint32) (xs:int list) =
@@ -105,7 +115,10 @@ module TpSequenceops =
         && Seq.fold (fun acc (fnT, fnD) ->
             acc && ansT.SequenceEqual <| (fnT n lst) && 
             ansD.SequenceEqual (fnD n lst)) true
-            [(Listops.takeI, Listops.dropI)]
+            [(Listops.takeI, Listops.dropI)
+            ; (ListopsHi.takeF, ListopsHi.dropF)
+            ; (ListopsHi.takeU, ListopsHi.dropU)
+            ; (ListopsHi.takeLc, ListopsHi.dropLc)]
     
     [<Property>]
     let ``existsForallProp`` (xs:int list) =
@@ -118,7 +131,9 @@ module TpSequenceops =
             [(Seqops.existsR, Seqops.forallR)
             ; (Seqops.existsI, Seqops.forallI)
             ; (Listops.existsR, Listops.forallR)
-            ; (Listops.existsI, Listops.forallI)]
+            ; (Listops.existsI, Listops.forallI)
+            ; (ListopsHi.existsF, ListopsHi.forallF)
+            ; (ListopsHi.existsU, ListopsHi.forallU)]
     
     [<Property>]
     let ``mapProp`` (xs:int list) =
@@ -130,7 +145,8 @@ module TpSequenceops =
             [Seqops.mapR; Seqops.mapI]
         && Seq.fold (fun acc fn ->
             acc && ans.SequenceEqual (fn proc lst)) true
-            [Listops.mapR; Listops.mapI]
+            [Listops.mapR; Listops.mapI; ListopsHi.mapF; ListopsHi.mapU
+            ; ListopsHi.mapLc]
     
     [<Property>]
     let ``iterProp`` (xs:int list) =
@@ -139,7 +155,8 @@ module TpSequenceops =
         let ans = Seq.iter proc lst in
         Seq.fold (fun acc fn ->
             acc && ans = (fn proc lst)) true
-            [Seqops.iterR; Seqops.iterI; Listops.iterR; Listops.iterI]
+            [Seqops.iterR; Seqops.iterI; Listops.iterR; Listops.iterI
+            ; ListopsHi.iterF; ListopsHi.iterU; ListopsHi.iterLc]
     
     [<Property>]
     let ``filterRemoveProp`` (xs:int list) =
@@ -156,7 +173,10 @@ module TpSequenceops =
             acc && ansF.SequenceEqual <| (fnF pred1 lst) && 
             ansR.SequenceEqual (fnR pred1 lst)) true
             [(Listops.filterR, Listops.removeR)
-            ; (Listops.filterI, Listops.removeI)]
+            ; (Listops.filterI, Listops.removeI)
+            ; (ListopsHi.filterF, ListopsHi.removeF)
+            ; (ListopsHi.filterU, ListopsHi.removeU)
+            ; (ListopsHi.filterLc, ListopsHi.removeLc)]
     
     [<Property>]
     let ``foldlFoldrProp`` (xs:int list) =
@@ -224,8 +244,9 @@ module TpSequenceops =
         Seq.fold (fun acc fn ->
             acc && ansOrd = (fn (<=) id lst) &&
             ansRev = (fn (>=) id lst)) true
-            [Seqops.isOrderedR; Seqops.isOrderedI
-                ; Listops.isOrderedR; Listops.isOrderedI]
+            [Seqops.isOrderedR; Seqops.isOrderedI; Listops.isOrderedR
+            ; Listops.isOrderedI; ListopsHi.isOrderedF; ListopsHi.isOrderedU
+            ; ListopsHi.isOrderedLc]
     
     
     [<Property>]
@@ -237,7 +258,8 @@ module TpSequenceops =
             [Seqops.appendR; Seqops.appendI]
         && Seq.fold (fun acc fn ->
             acc && ans.SequenceEqual (fn wss zss)) true
-            [Listops.appendR; Listops.appendI]
+            [Listops.appendR; Listops.appendI; ListopsHi.appendF
+            ; ListopsHi.appendU]
     
     [<Property>]
     let ``interleaveProp`` (xs:int list) (ys:int list) =
@@ -253,7 +275,8 @@ module TpSequenceops =
             [Seqops.interleaveR; Seqops.interleaveI]
         && Seq.fold (fun acc fn ->
             acc && ans.SequenceEqual (fn wss zss)) true
-            [Listops.interleaveR; Listops.interleaveI]
+            [Listops.interleaveR; Listops.interleaveI; ListopsHi.interleaveF
+            ; ListopsHi.interleaveU; ListopsHi.interleaveLc]
     
     [<Property>]
     let ``map2Prop`` (xs:int list) (ys:int list) =
@@ -269,7 +292,8 @@ module TpSequenceops =
             [Seqops.map2R; Seqops.map2I]
         && Seq.fold (fun acc fn ->
             acc && ans.SequenceEqual (fn proc wss zss)) true
-            [Listops.map2R; Listops.map2I]
+            [Listops.map2R; Listops.map2I; ListopsHi.map2F; ListopsHi.map2U
+            ; ListopsHi.map2Lc]
     
     [<Property>]
     let ``zipProp`` (xs:int list) (ys:int list) =
@@ -283,7 +307,8 @@ module TpSequenceops =
             [Seqops.zipR; Seqops.zipI]
         && Seq.fold (fun acc fn ->
             acc && ans.SequenceEqual (fn wss zss)) true
-            [Listops.zipR; Listops.zipI]
+            [Listops.zipR; Listops.zipI; ListopsHi.zipF; ListopsHi.zipU
+            ; ListopsHi.zipLc]
     
     [<Property>]
     let ``concatProp`` (xs:int list list) (ys:int list list list) =
@@ -294,9 +319,11 @@ module TpSequenceops =
         && Seq.fold (fun acc fn -> acc && ans3.SequenceEqual (fn nlst3)) true
             [Seqops.concatR; Seqops.concatI]
         && Seq.fold (fun acc fn -> acc && ans2 = (fn nlst2)) true
-            [Listops.concatR; Listops.concatI]
+            [Listops.concatR; Listops.concatI; ListopsHi.concatF
+            ; ListopsHi.concatU]
         && Seq.fold (fun acc fn -> acc && ans3 = (fn nlst3)) true
-            [Listops.concatR; Listops.concatI]
+            [Listops.concatR; Listops.concatI; ListopsHi.concatF
+            ; ListopsHi.concatU]
     
     
     [<Property>]
@@ -306,4 +333,4 @@ module TpSequenceops =
         Seq.fold (fun acc fn -> acc &&
             (fun (ah:int list, at:int list) (bh, bt) ->
                 ah.SequenceEqual bh && at.SequenceEqual bt) ans (fn lst)) true
-            [Listops.unzip2I]
+            [Listops.unzip2I; ListopsHi.unzip2F; ListopsHi.unzip2U]

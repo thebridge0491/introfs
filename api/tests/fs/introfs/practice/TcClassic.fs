@@ -10,6 +10,7 @@ open Introfs.Practice
 module TcClassic =
     
     module Util = Introfs.Util.Library
+    module ClassicHi = ClassicHiorder
     
     let (modNm, epsilon) = ("TcClassic", 0.001)
     let curry f a b = f(a, b)
@@ -44,7 +45,8 @@ module TcClassic =
             ans |> should (equalWithin (epsilon * ans)) (float <| fn n))
             (Seq.concat <| Seq.map (fun f ->
                 Seq.map (fun n -> (f, n)) [2.0f; 11.0f; 20.0f])
-                [Classic.squareR; Classic.squareI])
+                [Classic.squareR; Classic.squareI; ClassicHi.squareF
+                ; ClassicHi.squareU; ClassicHi.squareLc])
     
     [<Test>]
     let ``exptTest`` () = 
@@ -53,7 +55,8 @@ module TcClassic =
             Seq.iter (fun fn ->
                 ans |> should (equalWithin (epsilon * ans)) (float <| fn b n))
                 [Classic.exptR; Classic.exptI; Classic.fastExptR
-                    ; Classic.fastExptI; curry ClassicCs.ExptLp
+                    ; Classic.fastExptI; ClassicHi.exptF; ClassicHi.exptU
+                    ; ClassicHi.exptLc; curry ClassicCs.ExptLp
                     ; curry ClassicCs.ExptI])
             (*(Seq.concat <| Seq.map (fun b -> Seq.map (fun n -> (b, n)) [3.0f; 6.0f; 10.0f]) [2.0f; 11.0f; 20.0f])*)
             [for b in [2.0f; 11.0f; 20.0f] do
@@ -64,7 +67,8 @@ module TcClassic =
         Seq.iter (fun fn ->
             15L |> should equal <| fn 5L 0L
             ; 75L |> should equal <| fn 15L 10L)
-            [Classic.sumToR; Classic.sumToI]
+            [Classic.sumToR; Classic.sumToI; ClassicHi.sumToF
+            ; ClassicHi.sumToU; ClassicHi.sumToLc]
     
     [<Test>]
     let ``factTest`` () = 
@@ -76,13 +80,15 @@ module TcClassic =
                     [Classic.factLp; Classic.factI])*)
         Seq.iter (fun fn ->
                 120L |> should equal <| fn 5L)
-            [Classic.factR; Classic.factI; ClassicCs.FactLp; ClassicCs.FactI]
+            [Classic.factR; Classic.factI; ClassicHi.factF; ClassicHi.factU
+                ; ClassicHi.factLc; ClassicCs.FactLp; ClassicCs.FactI]
     
     [<Test>]
     let ``fibTest`` () = 
         Seq.iter (fun fn ->
             13 |> should equal <| fn 7)
-            [Classic.fibR; Classic.fibI]
+            [Classic.fibR; Classic.fibI; ClassicHi.fibF; ClassicHi.fibU
+            ; ClassicHi.fibLc]
     
     [<Test>]
     let ``pascaltriTest`` () = 
@@ -90,7 +96,9 @@ module TcClassic =
             ; [1; 4; 6; 4; 1]; [1; 5; 10; 10; 5; 1]] in
         Seq.iter (fun fn ->
             ans |> should equal <| fn 5)
-            [Classic.pascaltriMult; Classic.pascaltriAdd]
+            [Classic.pascaltriMult; Classic.pascaltriAdd
+            ; ClassicHi.pascaltriF; ClassicHi.pascaltriU
+            ; ClassicHi.pascaltriLc]
     
     [<Test>]
     let ``quotRemTest`` () = 
@@ -118,21 +126,26 @@ module TcClassic =
             ; 4 |> should equal <| fnGcd [24; 16; 12]
             ; 48 |> should equal <| fnLcm [24; 16]
             ; 96 |> should equal <| fnLcm [24; 16; 32])
-            [(Classic.gcdR, Classic.lcmR); (Classic.gcdI, Classic.lcmI)]
+            [(Classic.gcdR, Classic.lcmR); (Classic.gcdI, Classic.lcmI)
+            ; (ClassicHi.gcdF, ClassicHi.lcmF)
+            ; (ClassicHi.gcdU, ClassicHi.lcmU)]
     
     [<Test>]
     let ``baseExpandTest`` () = 
         Seq.iter (fun fn ->
             [1; 0; 1; 1] |> should equal <| fn 2 11
             ; [1; 1; 0; 1] |> should equal <| fn 4 81)
-            [Classic.baseExpandR; Classic.baseExpandI]
+            [Classic.baseExpandR; Classic.baseExpandI
+            ; ClassicHi.baseExpandF; ClassicHi.baseExpandU
+            ; ClassicHi.baseExpandLc]
     
     [<Test>]
     let ``baseTo10Test`` () = 
         Seq.iter (fun fn ->
             11 |> should equal <| fn 2 [1; 0; 1; 1]
             ; 81 |> should equal <| fn 4 [1; 1; 0; 1])
-            [Classic.baseTo10R; Classic.baseTo10I]
+            [Classic.baseTo10R; Classic.baseTo10I; ClassicHi.baseTo10F
+            ; ClassicHi.baseTo10U; ClassicHi.baseTo10Lc]
     
     [<Test>]
     let ``rangeTest`` () =
@@ -141,7 +154,9 @@ module TcClassic =
             lst |> should equal <| fnRg 0 4
             ; revlst |> should equal <| fnStep -1 4 0)
             [(Classic.rangeStepR, Classic.rangeR)
-            ; (Classic.rangeStepI, Classic.rangeI)]
+            ; (Classic.rangeStepI, Classic.rangeI)
+            ; (ClassicHi.rangeStepF, ClassicHi.rangeF)
+            ; (ClassicHi.rangeStepU, ClassicHi.rangeU)]
     
     [<Test>]
     let ``composeTest`` () = 

@@ -11,6 +11,7 @@ module TcSequenceops =
     
     module Util = Introfs.Util.Library
     module Seqops = Sequenceops
+    module ListopsHi = ListopsHiorder
     
     let (modNm, epsilon) = ("TcSequenceops", 0.001)
     let curry f a b = f(a, b)
@@ -53,7 +54,8 @@ module TcSequenceops =
             ; Seq.iter (fun fn ->
                 ans1 |> should equal <| fn float cnt
                 ; ans2 |> should equal <| fn (fun e -> 32.0 / 2.0 ** (float e)) cnt)
-                [Listops.tabulateR; Listops.tabulateI]
+                [Listops.tabulateR; Listops.tabulateI; ListopsHi.tabulateF
+                ; ListopsHi.tabulateU; ListopsHi.tabulateLc]
             ) [3; 5; 7]
     
     [<Test>]
@@ -64,7 +66,7 @@ module TcSequenceops =
                 Seq.length xss |> should equal <| fn xss
                 ; Seq.length yss |> should equal <| fn yss)
                 [Seqops.lengthR; Seqops.lengthI; Listops.lengthR
-                ; Listops.lengthI]
+                ; Listops.lengthI; ListopsHi.lengthF; ListopsHi.lengthU]
             ) [3; 5; 7]
     
     [<Test>]
@@ -72,7 +74,8 @@ module TcSequenceops =
         Seq.iter (fun xs ->
             Seq.iter (fun fn ->
                 Seq.item 3 xs |> should equal <| (Option.defaultValue -1 <| fn 3 xs))
-                [Seqops.nthR; Seqops.nthI; Listops.nthR; Listops.nthI]
+                [Seqops.nthR; Seqops.nthI; Listops.nthR; Listops.nthI
+                ; ListopsHi.nthF; ListopsHi.nthU; ListopsHi.nthLc]
             ) [lst; revlst]
         
     [<Test>]
@@ -95,7 +98,10 @@ module TcSequenceops =
                 [(Seqops.findIndexR, Seqops.findR)
                 ; (Seqops.findIndexI, Seqops.findI)
                 ; (Listops.findIndexR, Listops.findR)
-                ; (Listops.findIndexI, Listops.findI)]
+                ; (Listops.findIndexI, Listops.findI)
+                ; (ListopsHi.findIndexF, ListopsHi.findF)
+                ; (ListopsHi.findIndexU, ListopsHi.findU)
+                ; (ListopsHi.findIndexLc, ListopsHi.findLc)]
             ) [lst; revlst]
     
     [<Test>]
@@ -105,7 +111,9 @@ module TcSequenceops =
                 List.min xs |> should equal <| fnMin xs
                 ; List.max xs |> should equal <| fnMax xs)
                 [(Seqops.minR, Seqops.maxR); (Seqops.minI, Seqops.maxI)
-                ; (Listops.minR, Listops.maxR); (Listops.minI, Listops.maxI)]
+                ; (Listops.minR, Listops.maxR); (Listops.minI, Listops.maxI)
+                ; (ListopsHi.minF, ListopsHi.maxF)
+                ; (ListopsHi.minU, ListopsHi.maxU)]
             ) [lst; revlst]
     
     [<Test>]
@@ -124,7 +132,7 @@ module TcSequenceops =
         ; Seq.iter (fun fn -> Seq.rev lst |> should equal <| fn lst)
             [Seqops.revR; Seqops.revI]
         ; Seq.iter (fun fn -> Seq.rev lst |> should equal <| fn lst)
-            [Listops.revR; Listops.revI]
+            [Listops.revR; Listops.revI; ListopsHi.revF; ListopsHi.revU]
     
     [<Test>]
     let ``copyTest`` () = 
@@ -135,7 +143,8 @@ module TcSequenceops =
             
             ; Seq.iter (fun fn ->
                 List.map id xs |> should equal <| fn xs)
-                [Listops.copyR; Listops.copyI]
+                [Listops.copyR; Listops.copyI; ListopsHi.copyF
+                ; ListopsHi.copyU; ListopsHi.copyLc]
             ) [lst; revlst]
     
     [<Test>]
@@ -150,7 +159,10 @@ module TcSequenceops =
             ; Seq.iter (fun (fnT, fnD) ->
                 List.take n xs |> should equal <| fnT n xs
                 ; List.skip n xs |> should equal <| fnD n xs)
-                [(Listops.takeI, Listops.dropI)]
+                [(Listops.takeI, Listops.dropI)
+                ; (ListopsHi.takeF, ListopsHi.dropF)
+                ; (ListopsHi.takeU, ListopsHi.dropU)
+                ; (ListopsHi.takeLc, ListopsHi.dropLc)]
             ) [lst; revlst]
     
     [<Test>]
@@ -167,14 +179,18 @@ module TcSequenceops =
            [(Seqops.existsR, Seqops.forallR)
            ; (Seqops.existsI, Seqops.forallI)
            ; (Listops.existsR, Listops.forallR)
-           ; (Listops.existsI, Listops.forallI)]
+           ; (Listops.existsI, Listops.forallI)
+           ; (ListopsHi.existsF, ListopsHi.forallF)
+           ; (ListopsHi.existsU, ListopsHi.forallU)]
         ; Seq.iter (fun (fnE, fnA) ->
             List.exists pred2 lst2 |> should equal <| fnE pred2 lst2
             ; List.forall pred2 lst4 |> should equal <| fnA pred2 lst4)
            [(Seqops.existsR, Seqops.forallR)
            ; (Seqops.existsI, Seqops.forallI)
            ; (Listops.existsR, Listops.forallR)
-           ; (Listops.existsI, Listops.forallI)]
+           ; (Listops.existsI, Listops.forallI)
+           ; (ListopsHi.existsF, ListopsHi.forallF)
+           ; (ListopsHi.existsU, ListopsHi.forallU)]
     
     [<Test>]
     let ``mapTest`` () = 
@@ -186,7 +202,8 @@ module TcSequenceops =
             
             ; Seq.iter (fun fn ->
                 List.map proc xs |> should equal <| fn proc xs)
-                [Listops.mapR; Listops.mapI]
+                [Listops.mapR; Listops.mapI; ListopsHi.mapF
+                ; ListopsHi.mapU; ListopsHi.mapLc]
             ) [lst; revlst]
     
     [<Test>]
@@ -196,7 +213,8 @@ module TcSequenceops =
             Seq.iter (fun fn ->
                 List.iter proc xs |> should equal <| fn proc xs)
                 [Seqops.iterR; Seqops.iterI; Listops.iterR
-                ; Listops.iterI]
+                ; Listops.iterI; ListopsHi.iterF; ListopsHi.iterU
+                ; ListopsHi.iterLc]
             ) [lst; revlst]
     
     [<Test>]
@@ -213,7 +231,10 @@ module TcSequenceops =
                 List.filter pred1 xs |> should equal <| fnF pred1 xs
                 ; List.filter (pred1 >> not) xs |> should equal <| fnR pred1 xs)
                [(Listops.filterR, Listops.removeR)
-                ; (Listops.filterI, Listops.removeI)]
+                ; (Listops.filterI, Listops.removeI)
+                ; (ListopsHi.filterF, ListopsHi.removeF)
+                ; (ListopsHi.filterU, ListopsHi.removeU)
+                ; (ListopsHi.filterLc, ListopsHi.removeLc)]
             ) [lst; revlst]
     
     [<Test>]
@@ -298,7 +319,9 @@ module TcSequenceops =
                 verifyOrder (<=) id xs |> should equal <| fn (<=) id xs
                 ; verifyOrder (>=) id xs |> should equal <| fn (>=) id xs)
                 [Seqops.isOrderedR; Seqops.isOrderedI
-                ; Listops.isOrderedR; Listops.isOrderedI]
+                ; Listops.isOrderedR; Listops.isOrderedI
+                ; ListopsHi.isOrderedF; ListopsHi.isOrderedU
+                ; ListopsHi.isOrderedLc]
            ) [['a'; 'c'; 'e']; ['9'; '5'; '2']]
 
     
@@ -312,7 +335,8 @@ module TcSequenceops =
             
             ; Seq.iter (fun fn ->
                 Seq.append xs nines |> should equal <| fn xs nines)
-                [Listops.appendR; Listops.appendI]
+                [Listops.appendR; Listops.appendI; ListopsHi.appendF
+                ; ListopsHi.appendU]
             ) [lst; revlst]
     
     [<Test>]
@@ -326,7 +350,9 @@ module TcSequenceops =
         ; Seq.iter (fun fn ->
             [0; 9; 1; 9; 2; 9; 3; 9; 4] |> should equal <| fn lst nines
             ; [4; 9; 3; 9; 2; 9; 1; 9; 0] |> should equal <| fn revlst nines)
-            [Listops.interleaveR; Listops.interleaveI]
+            [Listops.interleaveR; Listops.interleaveI
+            ; ListopsHi.interleaveF; ListopsHi.interleaveU
+            ; ListopsHi.interleaveLc]
     
     [<Test>]
     let ``map2Test`` () = 
@@ -338,7 +364,8 @@ module TcSequenceops =
             
             ; Seq.iter (fun fn ->
                 List.map2 proc xs xs |> should equal <| fn proc xs xs)
-                [Listops.map2R; Listops.map2I]
+                [Listops.map2R; Listops.map2I; ListopsHi.map2F
+                ; ListopsHi.map2U; ListopsHi.map2Lc]
             ) [lst; revlst]
     
     [<Test>]
@@ -350,7 +377,8 @@ module TcSequenceops =
         
         ; Seq.iter (fun fn ->
             List.zip lst1 lst2 |> should equal <| fn lst1 lst2)
-            [Listops.zipR; Listops.zipI]
+            [Listops.zipR; Listops.zipI; ListopsHi.zipF; ListopsHi.zipU
+            ; ListopsHi.zipLc]
     
     [<Test>]
     let ``concatTest`` () = 
@@ -365,10 +393,12 @@ module TcSequenceops =
         
         ; Seq.iter (fun fn ->
             List.concat nlst1 |> should equal <| fn nlst1)
-            [Listops.concatR; Listops.concatI]
+            [Listops.concatR; Listops.concatI; ListopsHi.concatF
+            ; ListopsHi.concatU]
         ; Seq.iter (fun fn ->
             List.concat nlst2 |> should equal <| fn nlst2)
-            [Listops.concatR; Listops.concatI]
+            [Listops.concatR; Listops.concatI; ListopsHi.concatF
+            ; ListopsHi.concatU]
     
     
     [<Test>]
@@ -376,4 +406,4 @@ module TcSequenceops =
         let lst1 = [(0, 20); (1, 30)] in
         Seq.iter (fun fn ->
             List.unzip lst1 |> should equal <| fn lst1)
-            [Listops.unzip2I]
+            [Listops.unzip2I; ListopsHi.unzip2F; ListopsHi.unzip2U]
