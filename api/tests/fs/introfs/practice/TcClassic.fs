@@ -11,6 +11,7 @@ module TcClassic =
     
     module Util = Introfs.Util.Library
     module ClassicHi = ClassicHiorder
+    module ClassicStrm = ClassicStreams
     
     let (modNm, epsilon) = ("TcClassic", 0.001)
     let curry f a b = f(a, b)
@@ -40,13 +41,19 @@ module TcClassic =
     
     [<Test>]
     let ``squareTest`` () = 
-        Seq.iter (fun (fn, n) ->
+        Seq.iter (fun n ->
             let ans = float <| n ** 2.0f in
-            ans |> should (equalWithin (epsilon * ans)) (float <| fn n))
-            (Seq.concat <| Seq.map (fun f ->
-                Seq.map (fun n -> (f, n)) [2.0f; 11.0f; 20.0f])
+            Seq.iter (fun fn ->
+                ans |> should (equalWithin (epsilon * ans)) <|
+                    (float <| fn n))
                 [Classic.squareR; Classic.squareI; ClassicHi.squareF
-                ; ClassicHi.squareU; ClassicHi.squareLc])
+                ; ClassicHi.squareU; ClassicHi.squareLc]
+            ; Seq.iter (fun fn ->
+                ans |> should (equalWithin (epsilon * ans)) <|
+                    (float <| Seq.item (int n) (fn ())))
+                [ClassicStrm.squaresMap2; ClassicStrm.squaresU
+                ; ClassicStrm.squaresLc; ClassicStrm.squaresScanl]
+            ) [2.0f; 11.0f; 20.0f]
     
     [<Test>]
     let ``exptTest`` () = 
@@ -57,18 +64,29 @@ module TcClassic =
                 [Classic.exptR; Classic.exptI; Classic.fastExptR
                     ; Classic.fastExptI; ClassicHi.exptF; ClassicHi.exptU
                     ; ClassicHi.exptLc; curry ClassicCs.ExptLp
-                    ; curry ClassicCs.ExptI])
+                    ; curry ClassicCs.ExptI]
+            ; Seq.iter (fun fn ->
+                ans |> should (equalWithin (epsilon * ans)) <|
+                    (float <| Seq.item (int n) (fn b)))
+                [ClassicStrm.exptsMap2; ClassicStrm.exptsU
+                ; ClassicStrm.exptsLc; ClassicStrm.exptsScanl])
             (*(Seq.concat <| Seq.map (fun b -> Seq.map (fun n -> (b, n)) [3.0f; 6.0f; 10.0f]) [2.0f; 11.0f; 20.0f])*)
             [for b in [2.0f; 11.0f; 20.0f] do
                 for n in [3.0f; 6.0f; 10.0f] -> (b, n)]
     
     [<Test>]
     let ``sumToTest`` () = 
-        Seq.iter (fun fn ->
-            15L |> should equal <| fn 5L 0L
-            ; 75L |> should equal <| fn 15L 10L)
-            [Classic.sumToR; Classic.sumToI; ClassicHi.sumToF
-            ; ClassicHi.sumToU; ClassicHi.sumToLc]
+        Seq.iter (fun (hi, lo) ->
+            let ans = Seq.fold (+) 0L [lo .. hi] in
+            Seq.iter (fun fn -> 
+                ans |> should equal <| fn hi lo)
+                [Classic.sumToR; Classic.sumToI; ClassicHi.sumToF
+                ; ClassicHi.sumToU; ClassicHi.sumToLc]
+            ; Seq.iter (fun fn ->
+                ans |> should equal <| Seq.item (int (hi - lo)) (fn lo))
+                [ClassicStrm.sumsMap2; ClassicStrm.sumsU
+                ; ClassicStrm.sumsLc; ClassicStrm.sumsScanl]
+            ) [(5L, 0L); (15L, 10L)]
     
     [<Test>]
     let ``factTest`` () = 
@@ -78,17 +96,30 @@ module TcClassic =
                 Seq.iter (fun fn ->
                         120L |> should equal <| fn 5L)
                     [Classic.factLp; Classic.factI])*)
-        Seq.iter (fun fn ->
-                120L |> should equal <| fn 5L)
-            [Classic.factR; Classic.factI; ClassicHi.factF; ClassicHi.factU
-                ; ClassicHi.factLc; ClassicCs.FactLp; ClassicCs.FactI]
+        Seq.iter (fun n ->
+            let ans = Seq.fold (fun a e -> a * e) 1L [1L .. n] in
+            Seq.iter (fun fn -> ans |> should equal <| fn n)
+                [ClassicCs.FactLp; ClassicCs.FactI; Classic.factR
+                ; Classic.factI; ClassicHi.factF; ClassicHi.factU
+                ; ClassicHi.factLc]
+            ; Seq.iter (fun fn ->
+                ans |> should equal <| Seq.item (int n) (fn ()))
+                [ClassicStrm.factsMap2; ClassicStrm.factsU
+                ; ClassicStrm.factsLc; ClassicStrm.factsScanl]
+            ) [0L; 9L; 18L]
     
     [<Test>]
     let ``fibTest`` () = 
-        Seq.iter (fun fn ->
-            13 |> should equal <| fn 7)
-            [Classic.fibR; Classic.fibI; ClassicHi.fibF; ClassicHi.fibU
-            ; ClassicHi.fibLc]
+        Seq.iter (fun (n, ans) ->
+            Seq.iter (fun fn ->
+                ans |> should equal <| fn n)
+                [Classic.fibR; Classic.fibI; ClassicHi.fibF
+                ; ClassicHi.fibU; ClassicHi.fibLc]
+            ; Seq.iter (fun fn ->
+                ans |> should equal <| Seq.item (int n) (fn ()))
+                [ClassicStrm.fibsMap2; ClassicStrm.fibsU
+                ; ClassicStrm.fibsLc; ClassicStrm.fibsScanl]
+            ) [(7, 13); (8, 21); (9, 34)]
     
     [<Test>]
     let ``pascaltriTest`` () = 
@@ -99,6 +130,10 @@ module TcClassic =
             [Classic.pascaltriMult; Classic.pascaltriAdd
             ; ClassicHi.pascaltriF; ClassicHi.pascaltriU
             ; ClassicHi.pascaltriLc]
+        ; Seq.iter (fun fn ->
+            ans |> should equal <| Seq.take (5 + 1) (fn ()))
+            [ClassicStrm.pascalrowsMap2; ClassicStrm.pascalrowsU
+            ; ClassicStrm.pascalrowsLc; ClassicStrm.pascalrowsScanl]
     
     [<Test>]
     let ``quotRemTest`` () = 

@@ -11,6 +11,7 @@ module TpClassic =
     
     module Util = Introfs.Util.Library
     module ClassicHi = ClassicHiorder
+    module ClassicStrm = ClassicStreams
     type PropertyAttribute = FsCheck.NUnit.PropertyAttribute
     
     let (modNm, epsilon) = ("TpClassic", 0.001)
@@ -40,6 +41,11 @@ module TpClassic =
             acc && (Util.inEpsilon (epsilon * ans) ans (float <| fn n))) true
             [Classic.squareR; Classic.squareI; ClassicHi.squareF
                 ; ClassicHi.squareU; ClassicHi.squareLc]
+        && Seq.fold (fun acc fn -> 
+            acc && (Util.inEpsilon (epsilon * ans) ans
+                (float <| Seq.item (int n) (fn ())))) true
+            [ClassicStrm.squaresMap2; ClassicStrm.squaresU
+            ; ClassicStrm.squaresLc; ClassicStrm.squaresScanl]
     
     [<Property>] [<Category("Tag3")>]
     let ``exptProp`` (x: uint32) (y: uint32) =
@@ -51,17 +57,24 @@ module TpClassic =
                 ; Classic.fastExptI; ClassicHi.exptF; ClassicHi.exptU
                 ; ClassicHi.exptLc; curry ClassicCs.ExptLp
                 ; curry ClassicCs.ExptI]
+        && Seq.fold (fun acc fn -> 
+            acc && (Util.inEpsilon (epsilon * ans) ans
+                (float <| Seq.item (int n) (fn b)))) true
+            [ClassicStrm.exptsMap2; ClassicStrm.exptsU
+            ; ClassicStrm.exptsLc; ClassicStrm.exptsScanl]
     
     [<Property>]
-    let ``sumToProp`` (hi:int64) (lo:int64) =
-        let ans =
-            match hi >= lo with
-            |   true -> Seq.fold (fun acc e -> acc + e) lo [(lo + 1L) .. hi]
-            |   _ -> 0L in
+    let ``sumToProp`` (x:int64) (y:int64) =
+        let (hi, lo) = match x >= y with | true -> (x, y) | _ -> (y, x) in
+        let ans = Seq.fold (fun acc e -> acc + e) lo [(lo + 1L) .. hi] in
         Seq.fold (fun acc fn ->
             acc && ans.Equals (fn hi lo)) true
             [Classic.sumToR; Classic.sumToI; ClassicHi.sumToF
             ; ClassicHi.sumToU; ClassicHi.sumToLc]
+        && Seq.fold (fun acc fn -> 
+            acc && ans = (Seq.item (int (hi - lo)) (fn lo))) true
+            [ClassicStrm.sumsMap2; ClassicStrm.sumsU
+            ; ClassicStrm.sumsLc; ClassicStrm.sumsScanl]
     
     [<Property(MaxTest = 20, Verbose = true)>] [<Category("Tag3")>]
     let ``factProp`` (x: uint32) =
@@ -69,7 +82,11 @@ module TpClassic =
         let ans = Seq.fold (fun acc e -> acc * e) 1L [1L .. n] in
         Seq.fold (fun acc fn -> acc && ans.Equals (fn n)) true
             [Classic.factR; Classic.factI; ClassicHi.factF; ClassicHi.factU
-                ; ClassicHi.factLc; ClassicCs.FactLp; ClassicCs.FactI]
+            ; ClassicHi.factLc; ClassicCs.FactLp; ClassicCs.FactI]
+        && Seq.fold (fun acc fn -> 
+            acc && ans = (Seq.item (int n) (fn ()))) true
+            [ClassicStrm.factsMap2; ClassicStrm.factsU
+            ; ClassicStrm.factsLc; ClassicStrm.factsScanl]
     
     [<Property>]
     let ``fibProp`` (x:uint32) =
@@ -79,6 +96,10 @@ module TpClassic =
         Seq.fold (fun acc fn -> acc && ans.Equals (fn n)) true
             [Classic.fibR; Classic.fibI; ClassicHi.fibF; ClassicHi.fibU
             ; ClassicHi.fibLc]
+        && Seq.fold (fun acc fn -> 
+            acc && ans = (Seq.item (int n) (fn ()))) true
+            [ClassicStrm.fibsMap2; ClassicStrm.fibsU
+            ; ClassicStrm.fibsLc; ClassicStrm.fibsScanl]
     
     [<Property>]
     let ``pascaltriProp`` (x:uint32) =
@@ -93,6 +114,13 @@ module TpClassic =
             [Classic.pascaltriMult; Classic.pascaltriAdd
             ; ClassicHi.pascaltriF; ClassicHi.pascaltriU
             ; ClassicHi.pascaltriLc]
+        && Seq.fold (fun a fn -> 
+            let res = Seq.take (rows + 1) (fn ()) in
+            a && validNumRows res &&
+            fst (Seq.fold (fun (a1, n) r -> (a1 && validLenRow n r
+            && validSumRow n r, n + 1)) (true, 0) res)) true
+            [ClassicStrm.pascalrowsMap2; ClassicStrm.pascalrowsU
+            ; ClassicStrm.pascalrowsLc; ClassicStrm.pascalrowsScanl]
     
     [<Property>]
     let ``quotRemProp`` (x:int32) (y:uint32) =
