@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+
+  <PropertyGroup>
+    <AssemblyFile Condition=" '$(OutputType)' == 'library' ">$(AssemblyName).dll</AssemblyFile>
+    <AssemblyFile Condition=" '$(OutputType)' == 'exe' ">$(AssemblyName).exe</AssemblyFile>
+    <DistTargets Condition=" '$(DistTargets)' == '' ">DistTar;DistZip</DistTargets>
+    <TAREXT Condition=" '$(TAREXT)' == '' ">tar.gz</TAREXT>
+    <TAROPTS>$(TAROPTS) --format=posix --dereference --exclude-from=exclude.lst</TAROPTS>
+    <ZIPOPTS>$(ZIPOPTS) -9 -q --exclude @exclude.lst -r</ZIPOPTS>
+    <NugetApp Condition=" '$(NugetApp)' == '' ">$(HOME)\bin\nuget.exe</NugetApp>
+  </PropertyGroup>
+
+  <Target Name="_PreDist" Returns="$(DistDir)">
+	  <GetAssemblyIdentity AssemblyFiles="$(TargetDir)$(AssemblyFile)">
+	    <Output TaskParameter="Assemblies" ItemName="MyAssemblyInfo"/>
+	  </GetAssemblyIdentity>
+	  <GetAssemblyIdentity AssemblyFiles="$(TargetDir)$(AssemblyFile)">
+	    <Output TaskParameter="Assemblies" ItemName="MyAssemblyInfo"/>
+	  </GetAssemblyIdentity>
+	  <PropertyGroup>
+	    <DistDir>$(AssemblyName).$([System.Version]::Parse(%(MyAssemblyInfo.Version)).ToString(3))</DistDir>
+	  </PropertyGroup>
+	  <Copy SourceFiles="exclude.lst" DestinationFolder="build"/>
+	  <RemoveDir Directories="build\$(DistDir)"/>
+	  <MakeDir Directories="build\$(DistDir)"/>
+    <Exec WorkingDirectory="$(ProjectDir)" IgnoreExitCode="true"
+      Command="tar $(TAROPTS) -cf - . | tar -xpf - -C build\$(DistDir)"/>
+  </Target>
+  <Target Name="Dist" DependsOnTargets="_PreDist">
+	  <Delete Files="build\$(DistDir).$(TAREXT);build\$(DistDir).zip"/>
+	  <Exec WorkingDirectory="$(ProjectDir)" IgnoreExitCode="true"
+	    Condition=" $(DistTargets.ToLower().Contains('disttar')) "
+      Command="echo '### build\$(DistDir).$(TAREXT) ###' ; tar $(TAROPTS) -C build -caf build\$(DistDir).$(TAREXT) $(DistDir)"/>
+	  <Exec WorkingDirectory="$(ProjectDir)" IgnoreExitCode="true"
+	    Condition=" $(DistTargets.ToLower().Contains('distzip')) "
+      Command="echo '### build\$(DistDir).zip ###' ; (cd build ; zip $(ZIPOPTS) $(DistDir).zip $(DistDir))"/>
+  </Target>
+  <Target Name="MonoDoc" Condition=" '$(OS)' != 'Windows_NT' ">
+	  <Exec WorkingDirectory="$(ProjectDir)" IgnoreExitCode="true"
+      Command="mdoc update -o build\doc_xmls -i $(TargetDir)$(AssemblyName).xml $(TargetDir)$(AssemblyFile) ; mdoc export-html --force-update -o build\docs build\doc_xmls"/>
+  </Target>
+  <Target Name="Lint" Condition=" '$(OS)' != 'Windows_NT' ">
+    <PropertyGroup>
+      <GendarmeApp>$(HOME)\nuget\packages\Mono.Gendarme\tools\gendarme.exe</GendarmeApp>
+    </PropertyGroup>
+	  <Exec WorkingDirectory="$(ProjectDir)" IgnoreExitCode="true"
+      Command="$(ExeLauncher) $(GendarmeApp) --html build\lint_rpt.html  $(TargetDir)$(AssemblyFile)"/>
+  </Target>
+
+  <!--<Target Name="NugetPack" DependsOnTargets="Build">
+    <Exec WorkingDirectory="$(ProjectDir)" IgnoreExitCode="true"
+      Command="$(ExeLauncher) $(NugetApp) pack -packagesdirectory $(HOME)\.nuget\packages -outputdirectory $(ProjectDir)bin\$(Configuration) $(MSBuildProjectFile)"/>
+  </Target>-->
+  <Target Name="NugetAdd">
+	  <ItemGroup>
+	    <NugetPkg Include="$(ProjectDir)bin\$(Configuration)\$(AssemblyName).*.nupkg"/>
+	  </ItemGroup>
+    <Exec WorkingDirectory="$(TargetDir)" IgnoreExitCode="true"
+      Command="$(ExeLauncher) $(NugetApp) add -source $(HOME)\.nuget\packages @(NugetPkg->'%(FullPath)', ' ')"/>
+  </Target>
+  <Target Name="NugetInstall">
+	  <PropertyGroup>
+	    <PackageSpec Condition=" '$(PackageSpec)' == '' ">$(AssemblyName)</PackageSpec>
+	  </PropertyGroup>
+    <Exec WorkingDirectory="$(TargetDir)" IgnoreExitCode="true"
+      Command="$(ExeLauncher) $(NugetApp) install -source $(HOME)\.nuget\packages -framework $(TargetFramework) -excludeversion -o $(HOME)\nuget\packages $(PackageSpec)"/>
+  </Target>
+
+  <PropertyGroup>
+    <TestLibrary Condition=" '$(TestLibrary)' == '' ">nunit</TestLibrary>
+    <TestConsoleApp Condition=" '$(TestLibrary)' == 'xunit' ">$(HOME)\nuget\packages\xunit.runner.console\tools\net452\xunit.console.exe</TestConsoleApp>
+    <TestConsoleApp Condition=" '$(TestLibrary)' == 'nunit' ">$(HOME)\nuget\packages\NUnit.ConsoleRunner\tools\nunit3-console.exe</TestConsoleApp>
+  </PropertyGroup>
+
+  <Target Name="TestCompile">
+    <PropertyGroup>
+	    <TESTPROJ Condition=" '$(TESTPROJ)' == '' ">tests\*.*proj</TESTPROJ>
+	    <TestAssemblyFile>$(ProjectDir)tests\bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).Tests.dll</TestAssemblyFile>
+	  </PropertyGroup>
+	  <ItemGroup>
+      <TestProj Include="$(TESTPROJ)"/>
+    </ItemGroup>
+    <MSBuild Projects="@(TestProj)" RunEachTargetSeparately="true"
+      Targets="Restore;Build" Properties="ParentProjectDir=$(ProjectDir)"/>
+  </Target>
+  <Target Name="Test" DependsOnTargets="TestCompile">
+    <Exec WorkingDirectory="$(TargetDir)" IgnoreExitCode="true"
+      Command="MONO_PATH=$(MONO_PATH) DYLD_LIBRARY_PATH=$(DYLD_LIBRARY_PATH) LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(ExeLauncher) $(TestConsoleApp) $(TestAppArgs) $(TestAssemblyFile) $(TOPTS)"/>
+  </Target>
+  <Target Name="MonoCover" Condition=" '$(OS)' != 'Windows_NT' "
+      DependsOnTargets="TestCompile">
+    <Exec WorkingDirectory="$(TargetDir)" IgnoreExitCode="true"
+      Command="MONO_PATH=$(MONO_PATH) DYLD_LIBRARY_PATH=$(DYLD_LIBRARY_PATH) LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(ExeLauncher) --debug -O=-aot --profile=coverage:output=$(ProjectDir)build\cov.xml,covfilter-file=$(ProjectDir)resources\covfilter.txt --profile=log:output=$(ProjectDir)build\cov.dat,covfilter-file=$(ProjectDir)resources\covfilter.txt $(TestConsoleApp) $(TestAppArgs) $(TestAssemblyFile) $(TOPTS) ; mprof-report $(ProjectDir)build\cov.dat > $(ProjectDir)build\cov.txt"/>
+  </Target>
+
+</Project>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType Condition=" '$(OutputType)' == '' ">library</OutputType>
+    <AssemblyOriginatorKeyFile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe'">..\snkeyfile.snk.pub</AssemblyOriginatorKeyFile>
+    <SignAssembly Condition=" '$(AssemblyOriginatorKeyFile)' != '' ">true</SignAssembly>
+    <DelaySign Condition=" '$(AssemblyOriginatorKeyFile)' != '' ">true</DelaySign>
+    <ExeLauncher Condition=" '$(OS)' != 'Windows_NT' ">mono</ExeLauncher>
+    <TargetFramework Condition=" '$(TargetFramework)' == '' ">net471</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AdditionalLibPaths>$(HOME)\nuget\packages</AdditionalLibPaths>
+    <BuildProjectReferences Condition=" '$(BuildProjectReferences)' == '' ">false</BuildProjectReferences>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="fsharp.core"/>
+
+    <PackageReference Include="fscheck"/>
+    <PackageReference Include="fscheck.nunit"/>
+    <!--<PackageReference Include="fscheck.xunit"/>-->
+    <PackageReference Include="fsunit"/>
+    <!--<PackageReference Include="fsunit.xunit"/>-->
+    <PackageReference Include="nunit"/>
+    <PackageReference Include="nunit.consolerunner"/>
+    <PackageReference Include="nunit3testadapter"/>
+    <!--<PackageReference Include="xunit"/>-->
+    <!--<PackageReference Include="xunit.runner.console"/>-->
+    <PackageReference Include="microsoft.net.test.sdk"/>
+
+    <!--<Reference Include="introfs.util">
+	    <HintPath>$(HOME)\nuget\packages\Introfs.Util\lib\$(TargetFramework)\Introfs.Util.dll</HintPath>
+    </Reference>-->
+    <!--<HintPath_introfs_util Include="$(HOME)\nuget\packages\**\*\Introfs.Util.dll"/>
+    <Reference Include="introfs.util">
+	    <HintPath>@(HintPath_introfs_util->'%(FullPath)', ' ')</HintPath>
+    </Reference>
+    <PackageReference Include="introfs.util" Version="[0.1.0,)"/>-->
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\*.*proj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="**\*.fs"/>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packages>
+  <package id="fsharp.core" version="4.2.3"/>
+
+  <package id="fscheck.nunit" version="2.10.3"/>
+  <!--<package id="fscheck.xunit" version="2.10.3"/>-->
+  <package id="fsunit" version="3.0.0"/>
+  <!--<package id="fsunit.xunit" version="3.0.0"/>-->
+  <package id="nunit" version="3.8.1"/>
+  <package id="nunit.consolerunner" version="3.7.0"/>
+  <package id="nunit3testadapter" version="3.9.0"/>
+  <!--<package id="xunit" version="2.3.1"/>-->
+  <!--<package id="xunit.runner.console" version="2.3.1"/>-->
+  <package id="microsoft.net.test.sdk" version="15.5.0"/>
+
+  <package id="introfs.util" version="0.1.0"/>
+  <package id="log4net" version="2.0.10"/>
+  <!--<package id="ini-parser" version="2.5.2"/>-->
+
+  <!--<package id="mono.gendarme" version="2.11.0.20121120"/>-->
+  <!--<package id="ilrepack" version="2.0.13"/>-->
+</packages>

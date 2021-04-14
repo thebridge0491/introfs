@@ -13,7 +13,7 @@ open System.Reflection
 /// <summary>Library module.</summary>
 module Library =
 
-    /// <summary>Creates string representation of sequence, using strings 
+    /// <summary>Creates string representation of sequence, using strings
     /// (beg, sep, stop).</summary>
     /// <param name="beg">A string</param>
     /// <param name="sep">A string</param>
@@ -21,10 +21,10 @@ module Library =
     /// <param name="fmt">A function to format elements.</param>
     /// <param name="coll">A sequence.</param>
     /// <returns>The string representation.</returns>
-    let mkStringInit (beg: string, sep, stop) fmt (coll: seq<'T>) = 
+    let mkStringInit (beg: string, sep, stop) fmt (coll: seq<'T>) =
         match Seq.length coll with
         |   0 -> beg + stop
-        |   _ -> beg + (Seq.foldBack (fun el acc -> (fmt el) + 
+        |   _ -> beg + (Seq.foldBack (fun el acc -> (fmt el) +
             (if "" = acc then "" else sep) + acc) coll "") + stop
 
     /// <summary>Creates default string representation of sequence.</summary>
@@ -40,12 +40,12 @@ module Library =
     /// <param name="fmt">A function to format collection.</param>
     /// <param name="ncoll">A nested sequence.</param>
     /// <returns>The string representation.</returns>
-    let mkStringNested (beg: string, sep, stop) fmt (ncoll: seq<'T>) = 
+    let mkStringNested (beg: string, sep, stop) fmt (ncoll: seq<'T>) =
         match Seq.length ncoll with
         |   0 -> beg + stop
-        |   _ -> (Seq.fold (fun acc coll -> acc + (fmt coll) + sep) beg 
+        |   _ -> (Seq.fold (fun acc coll -> acc + (fmt coll) + sep) beg
             ncoll) + stop
-    
+
     /// <summary>Get file contents from embedded resources.</summary>
     /// <param name="rsrcFileNm">A string.</param>
     /// <param name="prefix">A string or null.</param>
@@ -62,7 +62,7 @@ module Library =
     /// <summary>Create string representation of ini config.</summary>
     /// <param name="cfg">An Ini config.</param>
     /// <returns>The string representation.</returns>
-    let iniCfgToStr (cfg: IniParser.IniData) = 
+    let iniCfgToStr (cfg: IniParser.Model.IniData) =
         let mapIni = ref Map.empty in
         match isNull cfg with
         | true -> mkStringInit ("map [", "; ", "]") string <| Map.toSeq !mapIni
@@ -70,7 +70,7 @@ module Library =
             (* // cfg: KeyFile.GKeyFile
             for grp in (cfg.GetGroups ()) do
                 for key in (cfg.GetKeys grp) do
-                    mapIni := Map.add (grp + ":" + key) 
+                    mapIni := Map.add (grp + ":" + key)
                         cfg.GetValue(grp, key) !mapIni*)
             // cfg: IniParser.IniData
             for sect in cfg.Sections do
@@ -96,7 +96,7 @@ module Library =
     let cartesianProd (xs: seq<'T>) (ys: seq<'T>) =
         (*[for x in xs do for y in ys do if true -> (x, y)]*)
         (*[for x in xs do for y in ys do if true then yield (x, y)]*)
-        Seq.concat <| Seq.map (fun x -> 
+        Seq.concat <| Seq.map (fun x ->
             Seq.filter (fun e -> true) <|
                 Seq.map (fun y -> (x, y)) ys) xs
 
@@ -104,8 +104,8 @@ module Library =
     /// <param name="args">An array</param>
     /// <returns>The exit code.</returns>
     //[<EntryPoint>]
-    let libmain (args: string[]) = 
+    let libmain (args: string[]) =
         let (xs, ys) = ([0; 1; 2], [10; 20; 30]) in
-        printfn "cartesianProd %s %s: %s" (mkString string xs) 
+        printfn "cartesianProd %s %s: %s" (mkString string xs)
             (mkString string ys) (mkString string (cartesianProd xs ys))
         0

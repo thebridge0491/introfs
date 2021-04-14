@@ -1,19 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Target Name="_CombineModules" Condition=" '$(AddModules)' != '' ">
+<Project>
+
+  <PropertyGroup>
+    <TargetType Condition=" '$(OutputType)' == 'Library' ">library</TargetType>
+    <TargetType Condition=" '$(OutputType)' == 'Exe' ">exe</TargetType>
+  </PropertyGroup>
+  <Target Name="_CombineModules" Condition=" '@(AddModules)' != '' ">
     <Csc OutputAssembly="$(TargetDir)$(AssemblyName).dll"
       Sources="$(SourcesAssyInfo)" References=""
-      AdditionalLibPaths="$(AdditionalLibPaths)" TargetType="$(OutputType)"
+      AdditionalLibPaths="$(AdditionalLibPaths)" TargetType="$(TargetType)"
       Optimize="$(Optimize)" DefineConstants="$(DefineConstants)"
       EmitDebugInformation="$(DebugSymbols)" DebugType="$(DebugType)"
       NoLogo="true" CheckForOverflowUnderflow="true" DelaySign="$(DelaySign)"
       AddModules="@(AddModules)" KeyFile="$(AssemblyOriginatorKeyFile)"
       DocumentationFile="$(TargetDir)$(AssemblyName).xml"/>
   </Target>
-  <Target Name="_MergeAssemblies" Condition=" '$(OtherAssemblies)' != '' ">
+  <Target Name="_MergeAssemblies" Condition=" '@(InputAssemblies)' != '' ">
     <Exec WorkingDirectory="$(TargetDir)" IgnoreExitCode="true"
-      Command="$(ExeLauncher) $(HOME)\nuget\packages\ILRepack\tools\ILRepack.exe /verbose /delaysign /keyfile:$(ProjectDir)$(AssemblyOriginatorKeyFile) /t:$(OutputType) /xmldocs /out:$(TargetPath) @(OtherAssemblies->'%(FullPath)', ' ')"/>
+      Command="$(ExeLauncher) $(HOME)\nuget\packages\ILRepack\tools\ILRepack.exe /verbose /delaysign /keyfile:$(ProjectDir)$(AssemblyOriginatorKeyFile) /t:$(TargetType) /xmldocs /out:$(TargetPath) @(InputAssemblies->'%(FullPath)', ' ')"/>
   </Target>
-  <Target Name="Build"
+  <Target Name="_CombineProducts" AfterTargets="AfterBuild"
     DependsOnTargets="_CombineModules;_MergeAssemblies"/>
+
 </Project>

@@ -1,4 +1,4 @@
-﻿namespace Introfs.Util
+namespace Introfs.Util
 
 open System.Reflection
 //[<assembly: AssemblyFileVersion("0.1.0.*")>]

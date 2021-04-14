@@ -1,5 +1,5 @@
 namespace Introfs.Intro.Tests
-    
+
 open System
 open System.Linq
 open NUnit.Framework
@@ -7,36 +7,36 @@ open FsUnit
 
 [<TestFixture>]
 module TcCollections =
-    
+
     module Util = Introfs.Util.Library
-    
+
     let (modNm, epsilon) = ("TcCollections", 0.001)
-    
-    [<TestFixtureSetUp>]
-    let setUpModule () = 
+
+    [<OneTimeSetUp>]
+    let setUpModule () =
         printf "\nsetUpModule(%s)\n" modNm ; ignore ()
-    
-    [<TestFixtureTearDown>]
-    let tearDownModule () = 
+
+    [<OneTimeTearDown>]
+    let tearDownModule () =
         ignore () ; printf "tearDownModule(%s)\n" modNm
-    
+
     [<SetUp>]
-    let setUp () = 
+    let setUp () =
         printf "setUp(%s)\n" modNm ; ignore ()
-    
+
     [<TearDown>]
-    let tearDown () = 
+    let tearDown () =
         ignore () ; printf "tearDown(%s)\n" modNm
-    
-    
+
+
     let wrapTest startFun endFun testFun =
         startFun () ; testFun () ; endFun ()
-    
+
     let markFunc stage funcNm =
         printf "%s(%s.%s)\n" stage modNm funcNm
-    
+
     [<Test>] [<Category("Tag4")>]
-    let ``ListTest`` () = 
+    let ``ListTest`` () =
         let lst = [2; 1; 0; 4; 3] in
         1 :: [] |> should equal [1]
         lst |> should equal [2; 1; 0; 4; 3]
@@ -57,9 +57,9 @@ module TcCollections =
         List.map (fun e -> e + 2) lst |> should equal [4; 3; 2; 6; 5]
         Array.ofList lst |> should equal [|2; 1; 0; 4; 3|]
         List.sortWith (fun a b -> compare b a) lst |> should equal [4; 3; 2; 1; 0]
-    
+
     [<Test>] [<Category("Tag4")>]
-    let ``SeqTest`` () = 
+    let ``SeqTest`` () =
         let xs = seq [2; 1; 0; 4; 3] in
         Seq.append Seq.empty (seq [1]) |> should equal <| seq [1]
         xs |> should equal <| seq [2; 1; 0; 4; 3]
@@ -80,9 +80,9 @@ module TcCollections =
         Seq.map (fun e -> e + 2) xs |> should equal <| seq [4; 3; 2; 6; 5]
         Seq.toArray xs |> should equal [|2; 1; 0; 4; 3|]
         Seq.sortWith (fun a b -> compare b a) xs |> should equal <| seq [4; 3; 2; 1; 0]
-    
+
     [<Test>] [<Category("Tag4")>]
-    let ``ResizeArrayTest`` () = 
+    let ``ResizeArrayTest`` () =
         let oolst = ResizeArray<_> [2; 1; 0; 4; 3] in
         oolst |> should equal <| ResizeArray<_> [2; 1; 0; 4; 3]
         oolst |> should not' (equal (ResizeArray<_> [2; 1; 0]))
@@ -102,9 +102,9 @@ module TcCollections =
         oolst.Sort (fun a b -> compare b a) ; oolst |> should equal <| ResizeArray<_> [4; 3; 2; 1; 0]
         oolst.AddRange [9; 9; 9; 9]
         oolst |> should equal <| ResizeArray<_> [4; 3; 2; 1; 0; 9; 9; 9; 9]
-    
+
     [<Test>] [<Category("Tag4")>]
-    let ``SetTest`` () = 
+    let ``SetTest`` () =
         let (set1, set2) = (ref Set.empty, ref <| set ['q'; 'p'; 'z'; 'u']) in
         let lst1 = ['a'; 'e'; 'k'; 'p'; 'u'; 'k'; 'a'] in
         let xor_set setA setB =
@@ -120,9 +120,9 @@ module TcCollections =
         Set.difference !set1 !set2 |> should equal <| set ['a'; 'e'; 'k']
         xor_set !set1 !set2 |> should equal <| set ['a'; 'e'; 'k'; 'q'; 'z']
         Set.toList !set1 |> should equal ['a'; 'e'; 'k'; 'p'; 'u']
-    
+
     [<Test>] [<Category("Tag4")>]
-    let ``MapTest`` () = 
+    let ``MapTest`` () =
         let map1 = ref Map.empty in
         let lst_str = ["ltr 0"; "ltr 1"; "ltr 2"; "ltr 3"; "ltr 4"; "ltr 5"; "ltr 6"] in
         let lst_char = ['a'; 'e'; 'k'; 'p'; 'u'; 'k'; 'a'] in

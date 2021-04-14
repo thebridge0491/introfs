@@ -1,5 +1,5 @@
 namespace Introfs.Foreignc.Tests
-    
+
 open System
 open NUnit.Framework
 open FsUnit
@@ -8,49 +8,49 @@ open Introfs.Foreignc
 
 [<TestFixture>]
 module TcClassic =
-    
+
     module Util = Introfs.Util.Library
-    
+
     let (modNm, epsilon) = ("TcClassic", 0.001)
     let curry f a b = f(a, b)
-    
-    [<TestFixtureSetUp>]
-    let setUpModule () = 
+
+    [<OneTimeSetUp>]
+    let setUpModule () =
         printf "\nsetUpModule(%s)\n" modNm ; ignore ()
-    
-    [<TestFixtureTearDown>]
-    let tearDownModule () = 
+
+    [<OneTimeTearDown>]
+    let tearDownModule () =
         ignore () ; printf "tearDownModule(%s)\n" modNm
-    
+
     [<SetUp>]
-    let setUp () = 
+    let setUp () =
         printf "setUp(%s)\n" modNm ; ignore ()
-    
+
     [<TearDown>]
-    let tearDown () = 
+    let tearDown () =
         ignore () ; printf "tearDown(%s)\n" modNm
-    
-    
+
+
     let wrapTest startFun endFun testFun =
         startFun () ; testFun () ; endFun ()
-    
+
     let markFunc stage funcNm =
         printf "%s(%s.%s)\n" stage modNm funcNm
-    
+
     [<Test>]
-    let ``factTest`` () = 
+    let ``factTest`` () =
         (*wrapTest (fun () -> markFunc "setUp" "factTest")
             (fun () -> markFunc "tearDown" "factTest")
-            (fun () -> 
+            (fun () ->
                 Seq.iter (fun fn ->
                         120L |> should equal <| fn 5L)
                     [Classic.factLp; Classic.factI])*)
         Seq.iter (fun fn ->
                 120L |> should equal <| fn 5L)
             [Classic.factLp; Classic.factI]
-    
+
     [<Test>]
-    let ``exptTest`` () = 
+    let ``exptTest`` () =
         Seq.iter (fun (b, n) ->
             let ans = float <| b ** n in
             Seq.iter (fun fn ->
