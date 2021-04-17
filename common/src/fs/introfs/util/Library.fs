@@ -48,12 +48,13 @@ module Library =
 
     /// <summary>Get file contents from embedded resources.</summary>
     /// <param name="rsrcFileNm">A string.</param>
+    /// <param name="assy">An assembly or null.</param>
     /// <param name="prefix">A string or null.</param>
     /// <returns>The file contents.</returns>
-    let getFromResources (rsrcFileNm: string) (prefix: string) =
-        let assembly = Assembly.GetExecutingAssembly () in
+    let getFromResources (rsrcFileNm: string) (assy: Assembly) (prefix: string) =
+        let assembly = if (not <| isNull assy) then assy else Assembly.GetExecutingAssembly () in
         let pathPfx = if (not <| isNull prefix) then prefix else
-            (assembly.GetType ()).Namespace + ".resources" in
+            (assembly.GetName ()).Name + ".resources" in
         using (if not <| isNull (assembly.GetManifestResourceStream rsrcFileNm) then (assembly.GetManifestResourceStream rsrcFileNm) else (assembly.GetManifestResourceStream <| pathPfx + "." +  rsrcFileNm)) (fun strm ->
             using (new System.IO.StreamReader(strm)) (fun reader ->
                 reader.ReadToEnd ())

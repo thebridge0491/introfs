@@ -8,6 +8,7 @@ namespace Introfs.Intro
 //#r "Introfs.Intro.dll" ;;
 
 //open System
+open System.Reflection
 
 /// <summary>Library module.</summary>
 module Library =
@@ -32,7 +33,7 @@ module Library =
         | exc0 -> 
             printfn "(exc: %s) Bad env var RSRC_PATH: %s\n" (exc0.ToString ()) rsrcPath
             try
-                buf := (Util.getFromResources greetPath null).TrimEnd('\n')
+                buf := (Util.getFromResources greetPath (Assembly.GetExecutingAssembly ()) null).TrimEnd('\n')
             with
             | exc1 ->
                 reraise ()

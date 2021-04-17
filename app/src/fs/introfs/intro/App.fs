@@ -233,10 +233,10 @@ module App =
         | exc0 -> 
             printfn "(exc: %s) Bad env var RSRC_PATH: %s\n" (exc0.ToString ()) rsrcPath
             try
-                iniStr := Util.getFromResources "prac.conf" null
-                jsonStr := Util.getFromResources "prac.json" <|
-                    (assembly.GetType ()).Namespace + ".resources"
-                yamlStr := Util.getFromResources "prac.yaml" null
+                iniStr := Util.getFromResources "prac.conf" assembly null
+                jsonStr := Util.getFromResources "prac.json" assembly <|
+                    (assembly.GetName ()).Name + ".resources"
+                yamlStr := Util.getFromResources "prac.yaml" assembly null
             with
             | exc1 ->
                 reraise ()
