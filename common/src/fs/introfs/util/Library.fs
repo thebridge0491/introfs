@@ -100,6 +100,15 @@ module Library =
         Seq.concat <| Seq.map (fun x ->
             Seq.filter (fun e -> true) <|
                 Seq.map (fun y -> (x, y)) ys) xs
+    
+    /// <summary>Retrieves head of sequence, if available.</summary>
+    /// <param name="nullDefault">A value</param>
+    /// <param name="xs">A sequence</param>
+    /// <returns>The head or null default.</returns>    
+    let headOr nullDefault xs =
+        match xs with
+        |   [] -> nullDefault
+        |   y::_ -> y
 
     /// <summary>Lib main function.</summary>
     /// <param name="args">An array</param>
