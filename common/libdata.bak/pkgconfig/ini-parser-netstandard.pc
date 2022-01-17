@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/ini-parser-netstandard
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/ini-parser-netstandard/lib/net20
+Assemblies=${assemblies_dir}/INIFileParser.dll
+
+Name: ini-parser-netstandard
+Description: ini-parser - A .NET, Mono and Unity3d compatible(*) library for reading/writing INI data from IO streams, file streams, and strings written in C#
+Version: 2.5.2
+Libs: -r:${assemblies_dir}/INIFileParser.dll

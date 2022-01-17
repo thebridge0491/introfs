@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/NUnitLite
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/NUnitLite/lib/net45
+Assemblies=${assemblies_dir}/nunitlite.dll
+
+Name: NUnitLite
+Description: NUnitLite - Provides a simple way to run NUnit tests, without the overhead of a full NUnit installation
+Version: 3.12.0
+Libs: -r:${assemblies_dir}/nunitlite.dll

@@ -80,9 +80,6 @@ type TcNewCls () =                     //as self =
         //raise (Exception()) |> ignore
         (fun () -> raise (Exception())) |> should throw typeof<Exception>
 
-    [<Test>] [<Category("Tag2")>] [<Platform("Win98, WinME")>]
-    member this.SkippedWinMETest () = ignore () // ...
-
     [<Test>] [<Category("Tag1")>] //[<Timeout(100)>]
     member this.PassedTest() = ignore () // Assert.Pass()
 

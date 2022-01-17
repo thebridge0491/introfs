@@ -1,0 +1,19 @@
+#light (*
+exec fsharpi /nologo /warn:3 /checked /lib:.,$HOME/nuget/packages `pkg-config --with-path=$HOME/.local/lib/pkgconfig --libs fsharp.core ini-parser-netstandard fscheck fscheck.nunit fsunit nunit nunitlite` /r:Introfs.Util.dll /r:Introfs.Util.Tests.exe $0 $@
+*)
+
+namespace Introfs.Util.Tests
+
+//#r "Introfs.Util.dll" ;;
+//#r "Introfs.Util.Tests.exe" ;;
+
+open System
+open NUnit.Framework
+open FsUnit
+open NUnitLite
+
+module TsMain =
+
+    [<EntryPoint>]
+    let main (args: string[]) =
+    	(new NUnitLite.AutoRun()).Execute(args)

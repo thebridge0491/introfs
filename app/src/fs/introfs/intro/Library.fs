@@ -1,5 +1,5 @@
 #light (*
-exec fsharpi /nologo /warn:3 /checked /lib:build/bin/Debug,build/bin/Release `pkg-config --with-path=$HOME/.local/lib/pkgconfig --libs ini-parser` /r:Introfs.Intro.dll $0 $@
+exec fsharpi /nologo /warn:3 /checked /lib:.,$HOME/nuget/packages `pkg-config --with-path=$HOME/.local/lib/pkgconfig --libs fsharp.core ini-parser-netstandard log4net system.diagnostics.textwritertracelistener mono.options newtonsoft.json yamldotnet` /r:Introfs.Intro.dll $0 $@
 *)
 
 namespace Introfs.Intro

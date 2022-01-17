@@ -1,5 +1,5 @@
 #light (*
-exec fsharpi /nologo /warn:3 /checked /lib:build/bin/Debug,build/bin/Release `pkg-config --with-path=$HOME/.local/lib/pkgconfig --libs ini-parser Mono.Options log4net Newtonsoft.Json YamlDotNet` /r:Introfs.Intro.dll $0 $@
+exec fsharpi /nologo /warn:3 /checked /lib:.,$HOME/nuget/packages `pkg-config --with-path=$HOME/.local/lib/pkgconfig --libs fsharp.core ini-parser-netstandard log4net system.diagnostics.textwritertracelistener mono.options newtonsoft.json yamldotnet` /r:Introfs.Intro.dll $0 $@
 *)
 
 namespace Introfs.Intro
@@ -210,11 +210,11 @@ module App =
             ] |> List.iter (fun (o, d, f) -> options.Add(o, d, f) |> ignore)
         
         let traceOut = IO.File.Create "trace.log" in
-        let lstnrConsole = new ConsoleTraceListener(true) in
+        let lstnrConsole = new TextWriterTraceListener(System.Console.Out) in
         let lstnrText = new TextWriterTraceListener(traceOut) in
         // /define:[TRACE|DEBUG]
-        Debug.Listeners.Add(lstnrConsole) |> ignore
-        Debug.Listeners.Add(lstnrText) |> ignore
+        Trace.Listeners.Add(lstnrConsole) |> ignore
+        Trace.Listeners.Add(lstnrText) |> ignore
         
         parseCmdopts args options
         
@@ -244,7 +244,7 @@ module App =
         
         //let cfgIni = new KeyFile.GKeyFile() in
         //cfgIni.LoadFromData (!iniStr)
-        let cfgIni = (new IniParser.StringIniParser()).ParseString(!iniStr) in
+        let cfgIni = (new IniParser.Parser.IniDataParser()).Parse(!iniStr) in
         (*
         let defaultDefn : Defn = {
             Hostname = ""; Domain = ""; File1 = {Path = ""; Ext = ""}; 
@@ -286,7 +286,7 @@ module App =
         runIntro rsrcPath optsRec
         
         //Trace.Fail "Trace example"
-        Trace.Flush () //Debug.Flush ()
+        Trace.Flush ()
         traceOut.Close ()
         lstnrConsole.Close ()
         lstnrText.Close ()

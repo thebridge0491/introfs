@@ -3,7 +3,7 @@ Introfs.Util
 .. .rst to .html: rst2html5 foo.rst > foo.html
 ..                pandoc -s -f rst -t html5 -o foo.html foo.rst
 
-Utilites sub-package for FSharp Intro examples project.
+Utilities sub-package for FSharp Intro examples project.
 
 Installation
 ------------
@@ -22,14 +22,18 @@ version control repository clone:
 build example with make:
 [sh] ./configure.sh [--prefix=$PREFIX] [--help]
 
-make build [test]
+make restore
+
+make all [testcompile check]
 
 make nugetadd [nugetinstall]
 
 build example with msbuild:
-[env LD_LIBRARY_PATH=$PREFIX/lib] msbuild /t:build [/t:test]
+msbuild /t:restore [/t:restore tests/*.*proj]
 
-msbuild /t:nugetpack,nugetadd [/t:nugetinstall]
+[LD_LIBRARY_PATH=$PREFIX/lib] msbuild /t:build [/t:build,test tests/*.*proj]
+
+msbuild /t:nugetadd,nugetinstall
 
 Usage
 -----

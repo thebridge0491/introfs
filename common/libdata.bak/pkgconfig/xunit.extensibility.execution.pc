@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/xunit.extensibility.execution
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/xunit.extensibility.execution/lib/net452
+Assemblies=${assemblies_dir}/xunit.execution.dotnet.dll
+
+Name: xunit.extensibility.execution
+Description: xunit.extensibility.execution - Includes xunit.execution.*.dll for extensibility purposes
+Version: 2.4.1
+Libs: -r:${assemblies_dir}/xunit.execution.dotnet.dll

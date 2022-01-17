@@ -1,0 +1,13 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/Introfs.Practice
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/Introfs.Practice/lib/net471
+Assemblies=${assemblies_dir}/Introfs.Practice.dll
+
+Name: Introfs.Practice
+Description: Practice sub-package for FSharp Intro examples project.
+URL: https://bitbucket.org/thebridge0491/introfs
+Version: 0.1.0
+Libs: -r:${assemblies_dir}/Introfs.Practice.dll

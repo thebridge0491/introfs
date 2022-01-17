@@ -1,10 +1,10 @@
 #light (*
-exec fsharpi /nologo /warn:3 /checked /lib:build/bin/Debug,build/bin/Release /r:Introfs.Foreignc.dll $0 $@
+exec fsharpi /nologo /warn:3 /checked /lib:.,$HOME/nuget/packages `pkg-config --with-path=$HOME/.local/lib/pkgconfig --libs fsharp.core` /r:Introfs.Foreignc.dll $0 $@
 *)
 
 namespace Introfs.Foreignc
 
-//#r "Introfs.Util.dll" ;;
+//#r "Introfs.Foreignc.dll" ;;
 //#r "Introfs.Foreignc.dll" ;;
 
 //open System

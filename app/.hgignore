@@ -97,3 +97,5 @@ xcuserdata/
 .build/
 Package.resolved
 *.xcworkspace
+
+Makefile

@@ -1,5 +1,5 @@
 #light (*
-exec fsharpi /nologo /warn:3 /checked /lib:build/bin/Debug,build/bin/Release `pkg-config --with-path=$HOME/.local/lib/pkgconfig --libs ini-parser` /r:Introfs.Util.dll $0 $@
+exec fsharpi /nologo /warn:3 /checked /lib:.,$HOME/nuget/packages `pkg-config --with-path=$HOME/.local/lib/pkgconfig --libs fsharp.core ini-parser-netstandard` /r:Introfs.Util.dll $0 $@
 *)
 
 namespace Introfs.Util

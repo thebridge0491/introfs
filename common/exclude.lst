@@ -40,3 +40,4 @@ javalib/*
 bin/*
 obj/*
 packages/*
+Makefile

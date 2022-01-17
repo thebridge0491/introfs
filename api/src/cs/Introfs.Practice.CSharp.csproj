@@ -4,11 +4,11 @@
   <PropertyGroup>
     <ParentProjectDir Condition=" '$(ParentProjectDir)' == ''">../../</ParentProjectDir>
     <OutputType Condition=" '$(OutputType)' == '' ">library</OutputType>
-    <AssemblyOriginatorKeyFile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe'">$(ParentProjectDir)snkeyfile.snk.pub</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe'">$(ParentProjectDir)codesign.snk.pub</AssemblyOriginatorKeyFile>
     <SignAssembly Condition=" '$(AssemblyOriginatorKeyFile)' != '' ">true</SignAssembly>
     <DelaySign Condition=" '$(AssemblyOriginatorKeyFile)' != '' ">true</DelaySign>
     <ExeLauncher Condition=" '$(OS)' != 'Windows_NT' ">mono</ExeLauncher>
-    <TargetFramework Condition=" '$(TargetFramework)' == '' ">net471</TargetFramework>
+    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">netstandard2.0;net471;net461</TargetFrameworks>
 
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <AdditionalLibPaths>$(HOME)\nuget\packages</AdditionalLibPaths>
@@ -17,6 +17,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="microsoft.netframework.referenceassemblies" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime;build;native;contentfiles;analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="netstandard.library"/>
     <PackageReference Include="fsharp.core"/>
     <PackageReference Include="log4net"/>
     <!--<PackageReference Include="introfs.util" Version="[0.1.0,)"/>-->

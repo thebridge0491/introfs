@@ -9,14 +9,12 @@
     <Description Condition=" '$(Description)' =='' ">Main app sub-package for FSharp Intro examples project.</Description>
     <Copyright Condition=" '$(Copyright)' =='' ">Copyright (c) 2021, $(Authors)</Copyright>
     <PackageLicenseExpression Condition=" '$(PackageLicenseExpression)' =='' ">Apache-2.0</PackageLicenseExpression>
-    <!--<PackageLicenseUrl>file:///LICENSE</PackageLicenseUrl>-->
-    <PackageLicenseUrl>https://opensource.org/licenses/Apache-2.0</PackageLicenseUrl>
     <PackageProjectUrl Condition=" '$(PackageProjectUrl)' =='' ">https://bitbucket.org/thebridge0491/introfs</PackageProjectUrl>
     <PackageTags Condition=" '$(PackageTags)' =='' ">demo intro development practice</PackageTags>
     <PackageReleaseNotes>Summary of changes made in this release of the package -- none.</PackageReleaseNotes>
 
     <OutputType>exe</OutputType>
-    <AssemblyOriginatorKeyFile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe'">snkeyfile.snk.pub</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe'">codesign.snk.pub</AssemblyOriginatorKeyFile>
     <SignAssembly Condition=" '$(AssemblyOriginatorKeyFile)' != '' ">true</SignAssembly>
     <DelaySign Condition=" '$(AssemblyOriginatorKeyFile)' != '' ">true</DelaySign>
     <ExeLauncher Condition=" '$(OS)' != 'Windows_NT' ">mono</ExeLauncher>
@@ -30,10 +28,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="microsoft.netframework.referenceassemblies" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime;build;native;contentfiles;analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Condition=" 'netstandard2.0' == '$(TargetFramework)' "
+      Include="netstandard.library"/>
     <PackageReference Include="fsharp.core"/>
     <PackageReference Include="log4net"/>
-    <PackageReference Include="ini-parser"/>
-
+    <PackageReference Include="ini-parser-netstandard"/>
+    <PackageReference Include="system.diagnostics.textwritertracelistener"/>
     <PackageReference Include="mono.options"/>
     <PackageReference Include="newtonsoft.json"/>
     <PackageReference Include="yamldotnet"/>
@@ -41,23 +45,21 @@
     <!--<PackageReference Include="mono.gendarme"/>-->
     <!--<PackageReference Include="ilrepack"/>-->
 
-    <!--<Reference Include="introfs.util">
-	    <HintPath>$(HOME)\nuget\packages\Introfs.Util\lib\$(TargetFramework)\Introfs.Util.dll</HintPath>
-    </Reference>-->
-    <HintPath_introfs_util Include="$(HOME)\nuget\packages\**\*\Introfs.Util.dll"/>
     <Reference Include="introfs.util">
-	    <HintPath>@(HintPath_introfs_util->'%(FullPath)', ' ')</HintPath>
+      <HintPath Condition=" 'netcoreapp2.0' == '$(TargetFramework)' ">$(HOME)\nuget\packages\Introfs.Util\lib\netstandard2.0\Introfs.Util.dll</HintPath>
+      <HintPath Condition=" 'netcoreapp2.0' != '$(TargetFramework)' ">$(HOME)\nuget\packages\Introfs.Util\lib\$(TargetFramework)\Introfs.Util.dll</HintPath>
+    </Reference>
+    <Reference Include="introfs.practice">
+      <HintPath Condition=" 'netcoreapp2.0' == '$(TargetFramework)' ">$(HOME)\nuget\packages\Introfs.Practice\lib\netstandard2.0\Introfs.Practice.dll</HintPath>
+      <HintPath Condition=" 'netcoreapp2.0' != '$(TargetFramework)' ">$(HOME)\nuget\packages\Introfs.Practice\lib\$(TargetFramework)\Introfs.Practice.dll</HintPath>
     </Reference>
     <PackageReference Include="introfs.util" Version="[0.1.0,)"/>
-    <HintPath_introfs_practice Include="$(HOME)\nuget\packages\**\*\Introfs.Practice.dll"/>
-    <Reference Include="introfs.practice">
-	    <HintPath>@(HintPath_introfs_practice->'%(FullPath)', ' ')</HintPath>
-    </Reference>
     <PackageReference Include="introfs.practice" Version="[0.1.0,)"/>
     <Reference Include="introfs.intro.csharp">
-	    <!--<Private>True</Private>-->
-	    <HintPath>$(TargetDir)Introfs.Intro.CSharp.dll</HintPath>
-	  </Reference>
+	  <Private>True</Private>
+	  <HintPath Condition=" 'netcoreapp2.0' == '$(TargetFramework)' ">bin\$(Configuration)\netstandard2.0\Introfs.Intro.CSharp.dll</HintPath>
+      <HintPath Condition=" 'netcoreapp2.0' != '$(TargetFramework)' ">bin\$(Configuration)\$(TargetFramework)\Introfs.Intro.CSharp.dll</HintPath>
+	</Reference>
   </ItemGroup>
 
   <ItemGroup>
@@ -66,17 +68,27 @@
       <Pack>true</Pack>
       <PackagePath>LICENSE</PackagePath>
     </Content>
-    <Content Include="resources\*.*" Exclude="resources\App.config">
+    <Content Include="resources\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>
-    <EmbeddedResource Include="resources\*.*" Exclude="resources\App.config">
+    <EmbeddedResource Include="resources\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <LogicalName>$(AssemblyName).resources.%(filename)%(extension)</LogicalName>
     </EmbeddedResource>
-    <!--<None Include="resources\*.*" Exclude="resources\App.config">
+    <!--<None Include="resources\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>-->
+  </ItemGroup>
+  <ItemGroup Condition=" 'netstandard2.0' == '$(TargetFramework)' ">
+    <None Include="$(HOME)\nuget\packages\NETStandard.Library\build\netstandard2.0\ref\netstandard.dll">
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(HOME)\nuget\packages\FSharp.Core\lib\netstandard2.0\FSharp.Core.dll">
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -85,17 +97,17 @@
     <Compile Condition=" '$(OutputType)' != 'library' And '$(OutputType)' != 'exe' "
       Include="src\**\*.fs" Exclude="src\**\App.fs;src\**\properties\*.fs"/>
     <Compile Include="src\**\App.fs"/>
-    <MixProjects Include="$(ProjectDir)src\*\*.*proj"/>
+    <MixProjects Include="$(MSBuildProjectDirectory)\src\*\*.*proj"/>
   </ItemGroup>
 
   <!--<ItemGroup Condition=" '@(MixProjects)' != '' And '$(OutputType)' == 'module'">
-    <AddModules Include="$(TargetDir)$(AssemblyName).netmodule"/>
-    <AddModules Include="$(TargetDir)$(AssemblyName).*.netmodule"/>
+    <AddModules Include="bin\$(Configuration)\net471\$(AssemblyName).netmodule"/>
+    <AddModules Include="bin\$(Configuration)\net471\$(AssemblyName).*.netmodule"/>
   </ItemGroup>
   <ItemGroup Condition=" '@(MixProjects)' != '' And '$(OutputType)' != 'module'">
-    <InputAssemblies Include="$(TargetDir)$(AssemblyName).exe" Condition=" '$(OutputType)' == 'exe' "/>
-    <InputAssemblies Include="$(TargetDir)$(AssemblyName).dll" Condition=" '$(OutputType)' == 'library' "/>
-    <InputAssemblies Include="$(TargetDir)$(AssemblyName).*.dll"/>
+    <InputAssemblies Include="bin\$(Configuration)\net471\$(AssemblyName).exe" Condition=" '$(OutputType)' == 'exe' "/>
+    <InputAssemblies Include="bin\$(Configuration)\net471\$(AssemblyName).dll" Condition=" '$(OutputType)' == 'library' "/>
+    <InputAssemblies Include="bin\$(Configuration)\net471\$(AssemblyName).*.dll"/>
   </ItemGroup>-->
 
   <Import Project="targetsmsbuild\Tools.*.targets"/>
@@ -111,7 +123,7 @@
   </Target>
   <Target Name="_BuildMixProjects" AfterTargets="BeforeBuild">
 	  <MSBuild Projects="@(MixProjects)" RunEachTargetSeparately="true"
-      Targets="Restore;Build" Properties="ParentProjectDir=$(ProjectDir)"/>
+      Targets="Restore;Build" Properties="ParentProjectDir=$(MSBuildProjectDirectory)\"/>
   </Target>
 
 </Project>
@@ -119,4 +131,7 @@
     msbuild /nologo /pp | sed -n '/^[ ]*<Target Name="[a-zA-Z]*"/ s|\(Target Name="[a-zA-Z]*"\).*|\1|p' | sort -->
   <!-- debug context: gdb -args mono -debug ... # lldb ; ddd -gdb; gdb
        valgrind context: valgrind -verbose -tool=memcheck -suppressions=resources/mono.supp mono -debug ...
+  -->
+  <!-- nuspec generated with msbuild /t:pack or msbuild /t:generatenuspec:
+    msbuild [/p:nuspecoutpath=obj/$(Configuration)] /t:generatenuspec
   -->

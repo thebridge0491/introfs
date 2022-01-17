@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/NUnit
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/NUnit/lib/net45
+Assemblies=${assemblies_dir}/nunit.framework.dll
+
+Name: NUnit
+Description: NUnit - Features a fluent assert syntax, parameterized, generic and theory tests and is user-extensible
+Version: 3.12.0
+Libs: -r:${assemblies_dir}/nunit.framework.dll

@@ -1,0 +1,55 @@
+#!/bin/sh
+
+# usage:
+#   [framework=netstandard2.0] sh depns_dotnet.sh nuget_install [pkgsDir] [pkgcfg]
+#   sh depns_dotnet.sh gac_depns [pkgsDir] [PREFIX]
+
+nuget_install() {
+	framework=${framework:-netstandard2.0}
+	pkgsDir=${1:-$HOME/nuget/packages} ; pkgcfg=${2:-$(dirname $0)/packages.config}
+	mono $HOME/bin/nuget.exe install -framework $framework -excludeversion \
+		-o $pkgsDir $pkgcfg
+
+	mono $HOME/bin/nuget.exe list -source $HOME/.nuget/packages ; sleep 5
+}
+
+# (export strongname pubkey): sn -p codesign.p12 codesign.snk.pub
+# (get token): SN_TOKEN=$(sn -t codesign.snk.pub)
+# (delay sign during compile): csc .. /delaysign /keyfile:codesign.snk.pub ...
+# (re-sign assembly): sn -R AssemblyX.dll codesign.p12
+# to install delay signed assemblies to GAC (global assembly cache),
+#   edit [/usr/local]/etc/mono/X.Y/machine.config
+#<configuration>
+#  . .
+#  <strongNames>
+#    <verificationSettings>
+#      <skip Token="$(SN_TOKEN)" Assembly="*" Users="*" />
+#    </verificationSettings>
+#    . .
+#  </strongNames>
+#</configuration>
+
+gac_depns() {
+	pkgsDir=${1:-$HOME/nuget/packages} ; PREFIX=${2:-$HOME/.local}
+
+	PKG_CONFIG="pkgconf --with-path=${PREFIX}/lib/pkgconfig"
+	pkgs_subpaths="FSharp.Core:lib/net45/FSharp.Core.dll NETStandard.Library:build/netstandard2.0/ref/netstandard.dll System.Diagnostics.TextWriterTraceListener:ref/net46/System.Diagnostics.TextWriterTraceListener.dll NUnit:lib/net45/nunit.framework.dll NUnitlite:lib/net45/nunitlite.dll xunit.extensibility.core:lib/net452/xunit.core.dll xunit.extensibility.execution:lib/net452/xunit.execution.dotnet.dll FsUnit:lib/net46/FsUnit.NUnit.dll FsUnit.xUnit:lib/net46/FsUnit.Xunit.dll FsCheck:lib/net452/FsCheck.dll FsCheck.NUnit:lib/net452/FsCheck.NUnit.dll FsCheck.Xunit:lib/net452/FsCheck.Xunit.dll Mono.Options:lib/net40/Mono.Options.dll log4net:lib/net45/log4net.dll ini-parser-netstandard:lib/net20/INIFileParser.dll Newtonsoft.Json:lib/net45/Newtonsoft.Json.dll YamlDotNet:lib/net45/YamlDotNet.dll"
+	pkgs=""
+
+	for pkg_subpath in ${pkgs_subpaths} ; do
+		pkgX=$(echo $pkg_subpath | cut -d: -f1) ;
+		subpathX=$(echo $pkg_subpath | cut -d: -f2) ;
+		pkgs="$pkgs ${pkgX}" ;
+		gacutil -root ${PREFIX}/lib -package ${pkgX} -i $pkgsDir/${pkgX}/${subpathX} ;
+	done
+	cp libdata/pkgconfig/*.pc ${PREFIX}/lib/pkgconfig/
+
+	echo '' ; set -x
+	gacutil -root ${PREFIX}/lib -l ; sleep 5
+	${PKG_CONFIG} --path $pkgs ; sleep 5 ; set +x
+}
+
+func=$1 ; shift ;
+${func} $@ ;
+
+#--------------------------------------------------------------------

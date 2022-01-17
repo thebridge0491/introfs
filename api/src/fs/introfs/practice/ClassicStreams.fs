@@ -1,4 +1,11 @@
+#light (*
+exec fsharpi /nologo /warn:3 /checked /lib:.,$HOME/nuget/packages `pkg-config --with-path=$HOME/.local/lib/pkgconfig --libs fsharp.core log4net` /r:Introfs.Practice.dll $0 $@
+*)
+
 namespace Introfs.Practice
+
+//#r "Introfs.Util.dll" ;;
+//#r "Introfs.Practice.dll" ;;
 
 module ClassicStreams = 
 

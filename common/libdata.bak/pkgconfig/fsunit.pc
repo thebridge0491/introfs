@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/FsUnit
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/FsUnit/lib/net46
+Assemblies=${assemblies_dir}/FsUnit.NUnit.dll
+
+Name: FsUnit
+Description: FsUnit - A set of extensions that add special testing syntax to NUnit
+Version: 3.9.0
+Libs: -r:${assemblies_dir}/FsUnit.NUnit.dll

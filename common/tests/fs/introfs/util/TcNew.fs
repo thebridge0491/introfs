@@ -72,9 +72,6 @@ module TcNew =
         //raise (Exception()) |> ignore
         (fun () -> raise (Exception())) |> should throw typeof<Exception>
 
-    [<Test>] [<Category("Tag2")>] [<Platform("Win98, WinME")>]
-    let ``skippedWinMETest`` () = ignore () // ...
-
     [<Test>] [<Category("Tag1")>] //[<Timeout(100)>]
     let ``passedTest`` () = ignore () // Assert.Pass()
 

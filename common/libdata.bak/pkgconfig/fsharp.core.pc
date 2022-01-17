@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/FSharp.Core
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/FSharp.Core/lib/net45
+Assemblies=${assemblies_dir}/FSharp.Core.dll
+
+Name: FSharp.Core
+Description: FSharp.Core - Redistributables from Visual F# Tools version 10.9 For F# 4.7
+Version: 4.7.2
+Libs: -r:${assemblies_dir}/FSharp.Core.dll

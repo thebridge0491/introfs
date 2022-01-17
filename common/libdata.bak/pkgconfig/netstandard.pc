@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/NETStandard.Library
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/NETStandard.Library/build/netstandard2.0/ref
+Assemblies=${assemblies_dir}/netstandard.dll
+
+Name: NETStandard Library
+Description: NETStandard Library - A set of standard .NET APIs that are prescribed to be used and supported together
+Version: 2.0.3
+Libs: -r:${assemblies_dir}/netstandard.dll

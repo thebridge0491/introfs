@@ -1,0 +1,13 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/Introfs.Util
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/Introfs.Util/lib/net471
+Assemblies=${assemblies_dir}/Introfs.Util.dll
+
+Name: Introfs.Util
+Description: Utilities sub-package for FSharp Intro examples project.
+URL: https://bitbucket.org/thebridge0491/introfs
+Version: 0.1.0
+Libs: -r:${assemblies_dir}/Introfs.Util.dll

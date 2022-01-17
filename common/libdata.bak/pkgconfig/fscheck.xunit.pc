@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/FsCheck.Xunit
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/FsCheck.Xunit/lib/net452
+Assemblies=${assemblies_dir}/FsCheck.Xunit.dll
+
+Name: FsCheck.Xunit
+Description: FsCheck.Xunit - Integrates FsCheck with xUnit.NET by adding a PropertyAttribute that runs FsCheck tests, similar to xUnit.NET's FactAttribute
+Version: 2.14.3
+Libs: -r:${assemblies_dir}/FsCheck.Xunit.dll
