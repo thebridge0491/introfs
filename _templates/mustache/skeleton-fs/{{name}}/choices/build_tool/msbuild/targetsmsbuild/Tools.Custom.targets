@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+
+  <PropertyGroup>
+    <!-- /p:fmts=\" 'tar.gz;zip' \" -->
+    <FMTS Condition=" '$(FMTS)' == '' ">tar.gz;zip</FMTS>
+  </PropertyGroup>
+  <ItemGroup>
+    <Frameworks Include="$(TargetFrameworks)"/>
+    <RevFrameworks Include="@(Frameworks->Reverse())"/>
+    <DistFmts Include="$(FMTS)"/>
+  </ItemGroup>
+  <PropertyGroup>
+    <AssemblyFile Condition=" '$(OutputType)' == 'library' ">$(AssemblyName).dll</AssemblyFile>
+    <AssemblyFile Condition=" '$(OutputType)' == 'exe' ">$(AssemblyName).exe</AssemblyFile>
+    <TAROPTS>$(TAROPTS) --format=posix --dereference --exclude-from=exclude.lst</TAROPTS>
+    <ZIPOPTS>$(ZIPOPTS) -9 -q --exclude @exclude.lst -r</ZIPOPTS>
+    <NugetApp Condition=" '$(NugetApp)' == '' ">$(HOME)\bin\nuget.exe</NugetApp>
+  </PropertyGroup>
+
+  <Target Name="_PreDist" Returns="$(DistDir)">
+	<PropertyGroup>
+	  <Framework>%(RevFrameworks.Identity)</Framework>
+	</PropertyGroup>
+	<GetAssemblyIdentity AssemblyFiles="bin\$(Configuration)\$(Framework)\$(AssemblyFile)">
+	  <Output TaskParameter="Assemblies" ItemName="MyAssemblyInfo"/>
+	</GetAssemblyIdentity>
+	<GetAssemblyIdentity AssemblyFiles="bin\$(Configuration)\$(Framework)\$(AssemblyFile)">
+	  <Output TaskParameter="Assemblies" ItemName="MyAssemblyInfo"/>
+	</GetAssemblyIdentity>
+	<PropertyGroup>
+	   <DistDir>$(AssemblyName).$([System.Version]::Parse(%(MyAssemblyInfo.Version)).ToString(3))</DistDir>
+	</PropertyGroup>
+	<Copy SourceFiles="exclude.lst" DestinationFolder="build"/>
+	<RemoveDir Directories="build\$(DistDir)"/>
+	<MakeDir Directories="build\$(DistDir)"/>
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\" IgnoreExitCode="true"
+      Command="tar $(TAROPTS) -cf - . | tar -xpf - -C build\$(DistDir)"/>
+  </Target>
+  <Target Name="Dist" Inputs="@(DistFmts)" Outputs="%(Identity).Dummy"
+      DependsOnTargets="_PreDist">
+    <PropertyGroup>
+      <Fmt>%(DistFmts.Identity)</Fmt>
+    </PropertyGroup>
+    <Delete Files="build\$(DistDir).$(Fmt.ToLower())"/>
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\" IgnoreExitCode="true"
+      Condition=" $(Fmt.ToLower().StartsWith('7z')) "
+      Command="echo '### build\$(DistDir).7z ###' ; (cd build ; 7za a -t7z -mx=9 $(DistDir).7z $(DistDir))"/>
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\" IgnoreExitCode="true"
+      Condition=" $(Fmt.ToLower().StartsWith('tar')) "
+      Command="echo '### build\$(DistDir).$(Fmt.ToLower()) ###' ; tar --posix -L -C build -caf build\$(DistDir).$(Fmt.ToLower()) $(DistDir)"/>
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\" IgnoreExitCode="true"
+      Condition=" $(Fmt.ToLower().StartsWith('zip')) "
+      Command="echo '### build\$(DistDir).zip ###' ; (cd build ; zip -9 -q -r $(DistDir).zip $(DistDir))"/>
+  </Target>
+  <Target Name="MonoDoc" Condition=" '$(OS)' != 'Windows_NT' ">
+	<PropertyGroup>
+	  <Framework>%(RevFrameworks.Identity)</Framework>
+	</PropertyGroup>
+	<Exec WorkingDirectory="$(MSBuildProjectDirectory)\" IgnoreExitCode="true"
+      Command="mdoc update -o build\doc_xmls -i bin\$(Configuration)\$(Framework)\$(AssemblyName).xml bin\$(Configuration)\$(Framework)\$(AssemblyFile) ; mdoc export-html --force-update -o build\docs build\doc_xmls"/>
+  </Target>
+  <Target Name="Lint" Condition=" '$(OS)' != 'Windows_NT' ">
+    <!--<PropertyGroup>
+      <GendarmeFnd>$(HOME)\.nuget\packages\mono.gendarme\*\tools\gendarme.exe</GendarmeFnd>
+    </PropertyGroup>
+    <Exec Command="echo $(GendarmeFnd) | head -n1" ConsoleToMSBuild="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="GendarmeApp"/>
+    </Exec>-->
+    <ItemGroup>
+      <GendarmeFnd Include="$(HOME)\.nuget\packages\mono.gendarme\*\tools\gendarme.exe"/>
+    </ItemGroup>
+    <PropertyGroup>
+      <Framework>%(RevFrameworks.Identity)</Framework>
+      <GendarmeApp>%(GendarmeFnd.Identity)</GendarmeApp>
+    </PropertyGroup>
+	<Exec WorkingDirectory="$(MSBuildProjectDirectory)\" IgnoreExitCode="true"
+      Command="$(ExeLauncher) $(GendarmeApp) --html build\lint_rpt.html  bin\$(Configuration)\$(Framework)\$(AssemblyFile)"/>
+  </Target>
+
+  <!--<Target Name="NugetPack" DependsOnTargets="Build">
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\" IgnoreExitCode="true"
+      Command="$(ExeLauncher) $(NugetApp) pack -packagesdirectory $(HOME)\.nuget\packages -outputdirectory $(MSBuildProjectDirectory)\bin\$(Configuration) $(MSBuildProjectFile)"/>
+  </Target>-->
+  <Target Name="NugetAdd">
+	<PropertyGroup>
+	  <Framework>%(RevFrameworks.Identity)</Framework>
+	</PropertyGroup>
+	<ItemGroup>
+	  <NugetPkg Include="$(MSBuildProjectDirectory)\bin\$(Configuration)\$(AssemblyName).*.nupkg"/>
+	</ItemGroup>
+    <Exec WorkingDirectory="bin\$(Configuration)\$(Framework)\" IgnoreExitCode="true"
+      Command="$(ExeLauncher) $(NugetApp) add -source $(HOME)\.nuget\packages @(NugetPkg->'%(FullPath)', ' ')"/>
+  </Target>
+  <Target Name="NugetInstall">
+	<PropertyGroup>
+	  <Framework>%(RevFrameworks.Identity)</Framework>
+	  <PackageSpec Condition=" '$(PackageSpec)' == '' ">$(AssemblyName)</PackageSpec>
+	</PropertyGroup>
+    <Exec WorkingDirectory="bin\$(Configuration)\$(Framework)\" IgnoreExitCode="true"
+      Command="$(ExeLauncher) $(NugetApp) install -source $(HOME)\.nuget\packages -framework $(Framework) -excludeversion -o $(HOME)\nuget\packages $(PackageSpec) ; $(ExeLauncher) $(NugetApp) search -source $(HOME)\.nuget\packages $(PackageSpec) ; cp $(MSBuildProjectDirectory)\src\$(PackageSpec.ToLower()).pc.in $(HOME)\.local\lib\pkgconfig\$(PackageSpec.ToLower()).pc ; sh -xc 'pkg-config --with-path=$(HOME)\.local\lib\pkgconfig --list-all | grep $(PackageSpec.ToLower())'"/>
+  </Target>
+
+</Project>

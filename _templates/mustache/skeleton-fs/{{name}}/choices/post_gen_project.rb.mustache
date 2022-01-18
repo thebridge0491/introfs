@@ -1,0 +1,64 @@
+#!/usr/bin/env ruby -w
+
+require 'English'
+require 'fileutils'
+
+if __FILE__ == $PROGRAM_NAME
+	FileUtils.mkdir_p('build')
+	FileUtils.cp_r('choices', 'build')
+	FileUtils.rm_r('choices')
+	
+	choices = {
+		:readmeext => '{{readmeext}}{{^readmeext}}.rst{{/readmeext}}',
+		:license => '{{license}}{{^license}}Apache-2.0{{/license}}',
+		:buildtool => '{{buildtool}}{{^buildtool}}msbuild{{/buildtool}}',
+		:testfrwk => '{{testfrwk}}{{^testfrwk}}nunit{{/testfrwk}}',
+		:executable => '{{executable}}{{^executable}}no{{/executable}}',
+		:ffilib => '{{ffilib}}{{^ffilib}}none{{/ffilib}}'
+		}
+	nesteddirs = "{{nesteddirs}}{{^nesteddirs}}introfs/util{{/nesteddirs}}"
+	parent = "{{parent}}{{^parent}}introfs{{/parent}}"
+	
+	FileUtils.cp("build/choices/readme/README#{choices[:readmeext]}", 
+		"README#{choices[:readmeext]}")
+	if File.exist?('build/choices/_parent_readme')
+		FileUtils.cp("build/choices/_parent_readme/README#{choices[:readmeext]}",
+			"build/choices/_parent_init/README#{choices[:readmeext]}")
+	end
+	
+	if ['Apache-2.0', 'MIT', 'BSD-3-Clause', 'GPL-3.0+', 'ISC', 'Unlicense'
+			].include?(choices[:license])
+		FileUtils.cp("build/choices/license/LICENSE_#{choices[:license]}", 'LICENSE')
+	end
+	
+	if File.exist?('build/choices/build_tool') and ['msbuild', 'make'
+	    ].include?(choices[:buildtool])
+		FileUtils.cp_r("build/choices/build_tool/#{choices[:buildtool]}/.", '.')
+	elsif File.exist?('build/choices/build_tool') # default: msbuild
+		FileUtils.cp_r('build/choices/build_tool/msbuild/.', '.')
+	end
+	
+	if File.exist?('build/choices/testfrwk') and ['nunit', 'xunit'].include?(
+			choices[:testfrwk])
+		FileUtils.cp_r("build/choices/testfrwk/#{choices[:testfrwk]}/.", ".")
+	elsif File.exist?('build/choices/testfrwk') # default: nunit
+		FileUtils.cp_r('build/choices/testfrwk/nunit/.', ".")
+	end
+	
+	if File.exist?("src/fs/#{nesteddirs}") and not 'yes' == choices[:executable]
+		Dir["src/fs/#{nesteddirs}/App.*"].each{|p| FileUtils.rm(p)}
+	end
+	
+	if File.exist?('build/choices/ffi_lib') and ['native', 'swig'].include?(choices[:ffilib])
+		FileUtils.cp_r("build/choices/ffi_lib/#{choices[:ffilib]}/.", "src/fs/#{nesteddirs}/")
+	end
+	
+	if File.exist?('../_templates') and File.directory?('../_templates')
+		skeletondir = "{{skeletondir}}{{^skeletondir}}#{ENV['HOME']}/Templates/mustache/skeleton-fs{{/skeletondir}}"
+		skel_pardir = File.dirname(skeletondir)
+		
+		FileUtils.mkdir_p('../_templates/mustache')
+		(Dir["#{skel_pardir}/render_mustache.*"]+[skeletondir]).each{|src|
+			FileUtils.cp_r(src, '../_templates/mustache/')}
+	end
+end

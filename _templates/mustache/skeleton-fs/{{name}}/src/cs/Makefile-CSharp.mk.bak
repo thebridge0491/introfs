@@ -1,0 +1,16 @@
+# (mixed CSharp & FSharp) CSharp sub-product Makefile script.
+
+mix_cs = $(shell ls src/cs/**/**/*.cs)
+
+$(OUTPUTPATH)/$(proj).CSharp.netmodule: $(mix_cs)
+	-if [ ! "" = "$^" ] ; then \
+		$(CSC) $(CSCFLAGS) /t:module \
+			`$(PKG_CONFIG) --libs $(reqs_src)` \
+			/doc:$(OUTPUTPATH)/$(proj).CSharp.xml /out:$@ $^ ; \
+	fi
+$(OUTPUTPATH)/$(proj).CSharp.dll: $(mix_cs)
+	-if [ ! "" = "$^" ] ; then \
+		$(CSC) $(CSCFLAGS) /t:library $(keyfileopts) $(resourceopts) \
+			`$(PKG_CONFIG) --libs $(reqs_src)` \
+			/doc:$(OUTPUTPATH)/$(proj).CSharp.xml /out:$@ $^ ; \
+	fi

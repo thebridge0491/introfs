@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/xunit.core
+libdir=${exec_prefix}/../nuget/packages
+#assemblies_dir=${libdir}/xunit.core/lib/net452
+Assemblies=${libdir}/xunit.extensibility.core/lib/netstandard1.1/xunit.core.dll ${libdir}/xunit.extensibility.execution/lib/netstandard1.1/xunit.execution.dotnet.dll
+
+Name: xunit.core
+Description: xunit.core - Includes the libraries for writing unit tests with xUnit.net
+Version: 2.4.1
+Libs: -r:${libdir}/xunit.extensibility.core/lib/netstandard1.1/xunit.core.dll -r:${libdir}/xunit.extensibility.execution/lib/netstandard1.1/xunit.execution.dotnet.dll

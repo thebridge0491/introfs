@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/YamlDotNet
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/YamlDotNet/lib/net45
+Assemblies=${assemblies_dir}/YamlDotNet.dll
+
+Name: YamlDotNet
+Description: YamlDotNet - A .NET library for YAML
+Version: 8.1.2
+Libs: -r:${assemblies_dir}/YamlDotNet.dll

@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/Mono.Options
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/Mono.Options/lib/net40
+Assemblies=${assemblies_dir}/Mono.Options.dll
+
+Name: Mono.Options
+Description: Mono.Options - A Getopt::Long-inspired option parsing library for C#
+Version: 6.6.0.161
+Libs: -r:${assemblies_dir}/Mono.Options.dll

@@ -4,97 +4,111 @@ help:
 
 PKG_CONFIG = pkg-config --with-path=$(PREFIX)/lib/pkgconfig
 
-pkg ?= {{projectcap}}{{^projectcap}}Util{{/projectcap}}
-proj ?= {{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}
-namespace_path ?= $(shell echo $(proj) | tr 'A-Z' 'a-z' | sed 'y|.|/|')
+pkg = {{projectcap}}{{^projectcap}}Util{{/projectcap}}
+parent = {{parentcap}}{{^parentcap}}Introfs{{/parentcap}}
+proj = $(parent).$(pkg)
+namespace_path = $(shell echo $(proj) | tr 'A-Z' 'a-z' | sed 'y|.|/|')
 version = {{version}}{{^version}}0.1.0{{/version}}
+FRAMEWORK = net471
+# [csc /langversion:7.1 | mcs /sdk:4.7.1 /pkg:dotnet]
+CSC = csc /langversion:7.1
+FSC = fsharpc --consolecolors- --noframework
+EXELAUNCHER = mono
+NUGETAPP = $(HOME)/bin/nuget.exe
 
-# nunit, xunit
-TESTFRWK = nunit
-{{#executable}}
-# library, exe, module
-outputtype = exe
-startupopts = /main:$(proj).App
-resourceopts = $(shell ls resources | sed 's|^\(.*\)$$|/resource:resources/\1,$(proj).resources.\1|g')
-{{/executable}}
-{{^executable}}
-# library, exe, module
-outputtype = library
-#startupopts = /main:$(proj).App
-resourceopts = $(shell ls resources | grep -vie 'App.config' | sed 's|^\(.*\)$$|/resource:resources/\1,$(proj).resources.\1|g')
-{{/executable}}
-keyfileopts ?= /delaysign /keyfile:snkeyfile.snk.pub
+CSCFLAGS := $(CSCFLAGS) /nologo /checked /warn:4 /lib:.,$(HOME)/nuget/packages
+FSCFLAGS := $(FSCFLAGS) /nologo /checked /warn:3 /lib:.,$(HOME)/nuget/packages
+OUTPUTPATH = bin/$(CONFIG)/$(FRAMEWORK)
 
-ifdef DEBUG
-CONFIG = Debug
-CSCFLAGS := $(CSCFLAGS) /debug /d:DEBUG /d:TRACE
-FSCFLAGS := $(FSCFLAGS) /debug /d:DEBUG /d:TRACE
+# library | exe | module
+outputtype = {{#executable}}exe{{/executable}}{{^executable}}library{{/executable}}
+# dll | exe | netmodule
+outext = {{#executable}}exe{{/executable}}{{^executable}}dll{{/executable}}
+{{^executable}}#{{/executable}}startupopts = /main:$(proj).App
+resourceopts = $(shell ls resources{{^executable}} | grep -vie 'App.config'{{/executable}} | sed 's|^\(.*\)$$|/resource:resources/\1,$(proj).resources.\1|g')
+keyfileopts = /delaysign /keyfile:codesign.snk.pub
 
-else
-CONFIG = Release
-CSCFLAGS := $(CSCFLAGS) /optimize
-FSCFLAGS := $(FSCFLAGS) /optimize
-endif
+# log4net netstandard
+reqs_src = fsharp.core ini-parser-netstandard{{#executable}} log4net system.diagnostics.textwritertracelistener mono.options newtonsoft.json yamldotnet{{/executable}}
 
-ifeq ($(outputtype),module)
-outext = netmodule
+## fsunit.xunit
+##reqs_tests = xunit.core fscheck fscheck.xunit fsunit.xunit
+# fsunit nunitlite
+reqs_tests = nunit fscheck fscheck.nunit fsunit
 
-else ifeq ($(outputtype),exe)
-outext = exe
-
-else
-outext = dll
-endif
-
-OUTPUTPATH = build/bin/$(CONFIG)
-ADDLIBPATHS := $(ADDLIBPATHS) /lib:.,/usr/lib/mono/fsharp,/usr/local/lib/mono/fsharp,$(HOME)/nuget/packages,build,$(OUTPUTPATH)
-# /platform:x64
-CSCFLAGS := $(CSCFLAGS) /nologo /warn:4 /checked $(ADDLIBPATHS)
-FSCFLAGS := $(FSCFLAGS) /nologo /warn:3 /checked $(ADDLIBPATHS)
-
-#AddModulesOpts = # /addmodule:$(OUTPUTPATH)/$(proj).netmodule /addmodule:$(OUTPUTPATH)/$(proj).netmodule
-#OtherAssemblies = # $(OUTPUTPATH)/$(proj)*.exe $(OUTPUTPATH)/$(proj)*.dll
-
-# log4net Mono.Options Newtonsoft.Json YamlDotNet
-refs_src := $(refs_src) $(shell $(PKG_CONFIG) --libs ini-parser)
-
-src_cs = $(shell ls src/cs/**/*.cs src/cs/**/**/*.cs)
-src_fs = $(shell ls src/fs/**/*.fs src/fs/**/**/*.fs | grep -ve App) $(shell ls src/fs/**/App.fs src/fs/**/**/App.fs)
-
-
-#src_monooptions = $(shell $(PKG_CONFIG) --variable=Sources mono-options)
-#
-#$(OUTPUTPATH)/Mono.Options.dll : $(src_monooptions)
-#	printf "using System.Reflection;\n[assembly: AssemblyVersion(\"1.1.0\")]" \
-#		> $(OUTPUTPATH)/MonoOptionsAssemblyInfo.cs
-#	$(CSC) $(CSCFLAGS) /t:library $(keyfileopts) \
-#		/doc:$(OUTPUTPATH)/Mono.Options.xml /out:$@ \
-#		$(src_monooptions) $(OUTPUTPATH)/MonoOptionsAssemblyInfo.cs
-#	gacutil -root $(HOME)/.local/lib -package Mono.Options -i $@
-#	gacutil -root $(HOME)/.local/lib -l ; sleep 3
-
-
-#ifeq ($(TESTFRWK),xunit)
-#refs_tests := $(refs_tests) /r:FsUnit.xUnit/Lib/net40/FsUnit.Xunit.dll /r:FsUnit.xUnit/Lib/net40/NHamcrest.dll /r:FsUnit.xUnit/Lib/net40/FsUnit.CustomMatchers.dll
-#else
-#refs_tests := $(refs_tests) /r:FsUnit/Lib/Net40/FsUnit.NUnit.dll
-#endif
-refs_tests := $(refs_tests) /r:$(proj).$(outext)
+#src_cs = $(shell ls src/cs/**/**/*.cs)
+src_fs = $(shell ls src/fs/**/**/*.fs | grep -ve App) $(shell ls src/fs/**/**/App.fs)
 
 #tests_cs = $(patsubst %,%,$(wildcard tests/cs/**/*.cs tests/cs/**/**/*.cs))
-tests_cs = $(shell ls tests/cs/**/*.cs tests/cs/**/**/*.cs)
+#tests_cs = $(shell ls tests/cs/**/*.cs tests/cs/**/**/*.cs)
 tests_fs = $(shell ls tests/fs/**/*.fs tests/fs/**/**/*.fs)
 
-build/.depend:
-	-@mkdir -p $(OUTPUTPATH) ; cp snkeyfile.snk.pub $(OUTPUTPATH)/
+build/.depend: $(src_cs) $(src_fs) $(tests_cs) $(tests_fs)
+	-@mkdir -p $(OUTPUTPATH) ; cp codesign.snk.pub $(OUTPUTPATH)/
 	-@echo '' > build/.depend
 
-.PHONY: build
+$(OUTPUTPATH)/$(proj).$(outext): $(src_cs) $(src_fs)
+	if [ ! "" = "$(src_fs)" ] && [ "" = "$(src_cs)" ] ; then \
+		$(FSC) $(FSCFLAGS) /target:$(outputtype) $(keyfileopts) $(resourceopts) \
+			`$(PKG_CONFIG) --libs $(reqs_src)` /sig:$(OUTPUTPATH)/$(proj).fsi \
+			/doc:$(OUTPUTPATH)/$(proj).xml /out:$@ $(src_fs) \
+			src/fs/properties/*.fs ; \
+	elif [ "" = "$(src_fs)" ] && [ ! "" = "$(src_cs)" ] ; then \
+		$(CSC) $(CSCFLAGS) /t:$(outputtype) $(keyfileopts) $(resourceopts) \
+			$(startupopts) `$(PKG_CONFIG) --libs $(reqs_src)` \
+			/doc:$(OUTPUTPATH)/$(proj).xml /out:$@ $(src_cs) \
+			src/cs/properties/*.cs ; \
+	fi
+	-if [ -f $(OUTPUTPATH)/$(proj).FSharp.netmodule ] ; then \
+		$(CSC) $(CSCFLAGS) /t:$(outputtype) $(keyfileopts) $(resourceopts) \
+			$(startupopts) `$(PKG_CONFIG) --libs $(reqs_src)` \
+			/doc:$(OUTPUTPATH)/$(proj).xml /out:$@ \
+			/addmodule:$@ /addmodule:$(OUTPUTPATH)/$(proj).FSharp.netmodule \
+			src/cs/properties/*.cs ; \
+	elif [ -f $(OUTPUTPATH)/$(proj).FSharp.dll ] ; then \
+		(cd $(OUTPUTPATH) ; $(EXELAUNCHER) $(ILREPACKAPP) /t:$(outputtype) $(keyfileopts) /verbose /xmldocs /out:$(proj).$(outext) $(proj).$(outext) $(proj).FSharp.dll) ; \
+	fi
 
-#cstargets = $(OUTPUTPATH)/$(proj).CSharp.dll
-fstargets = $(OUTPUTPATH)/$(proj).$(outext)
+$(OUTPUTPATH)/$(proj).Tests.dll: $(tests_cs) $(tests_fs)
+	-if [ ! "" = "$(tests_fs)" ] ; then \
+		$(FSC) $(FSCFLAGS) /target:library `$(PKG_CONFIG) --libs $(reqs_tests)` \
+			/r:$(OUTPUTPATH)/$(proj).$(outext) /out:$@ $(tests_fs) ; \
+	else \
+		$(CSC) $(CSCFLAGS) /t:library `$(PKG_CONFIG) --libs $(reqs_tests)` \
+			/r:$(OUTPUTPATH)/$(proj).$(outext) /out:$@ $(tests_cs) ; \
+	fi
 
-build: build/.depend $(cstargets) $(fstargets) ## build
+bin/$(CONFIG)/$(proj).$(version).nupkg: $(OUTPUTPATH)/$(proj).$(outext) $(proj).nuspec
+	-rm -rf build/nupkg
+	-mkdir -p build/nupkg/content build/nupkg/lib/$(FRAMEWORK) build/nupkg/build
+	-cp -fR $(proj).nuspec LICENSE build/nupkg/
+	-cp -fR LICENSE resources build/nupkg/content/
+	-cp -fR $(OUTPUTPATH)/$(proj).*dll $(OUTPUTPATH)/$(proj).*db \
+		$(OUTPUTPATH)/$(proj).*xml build/nupkg/lib/$(FRAMEWORK)/
+	-cp -fR $(OUTPUTPATH)/$(proj).exe build/nupkg/build/
+#	-cp -fR src tests build/nupkg/
+	-cd build/nupkg ; $(EXELAUNCHER) $(NUGETAPP) pack -excludeemptydirectories \
+		-packagesdirectory $(HOME)/.nuget/packages \
+		-outputdirectory ../../bin/$(CONFIG) $(proj).nuspec
+
+.PHONY: restore copyreqs all nugetpack testcompile
+
+restore: packages.config ## Restore
+	-$(EXELAUNCHER) $(NUGETAPP) install -framework $(FRAMEWORK) -excludeversion \
+	   -o $(HOME)/nuget/packages packages.config
+	-$(EXELAUNCHER) $(NUGETAPP) list -source $(HOME)/.nuget/packages ; sleep 3
+
+copyreqs: ## copy requirements to output path
+	-cd $(OUTPUTPATH) ; cp -v `$(PKG_CONFIG) --variable=Assemblies $(reqs_src) $(reqs_tests)` .
+
+testcompile: $(OUTPUTPATH)/$(proj).Tests.dll ## compile test
+
+nugetpack: bin/$(CONFIG)/$(proj).$(version).nupkg ## Nuget pack
+
+all: build/.depend copyreqs $(OUTPUTPATH)/$(proj).CSharp.dll $(OUTPUTPATH)/$(proj).$(outext) nugetpack ## compile
+
+-include src/fs/Makefile-FSharp.mk
+-include src/cs/Makefile-CSharp.mk
 
 -include build/.depend Makefile-targets.mk
 #-include Makefile-auxffi.mk

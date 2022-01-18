@@ -1,5 +1,5 @@
 #light (*
-exec fsharpi /nologo /warn:3 /checked /lib:build/bin/Debug,build/bin/Release /r:{{parentcap}}{{^parentcap}}Introfs{{/parentcap}}.{{projectcap}}{{^projectcap}}Util{{/projectcap}}.dll $0 $@
+exec fsharpi /nologo /warn:3 /checked /lib:.,$HOME/nuget/packages `pkg-config --with-path=$HOME/.local/lib/pkgconfig --libs fsharp.core` /r:{{parentcap}}{{^parentcap}}Introfs{{/parentcap}}.{{projectcap}}{{^projectcap}}Util{{/projectcap}}.dll $0 $@
 *)
 
 namespace {{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}

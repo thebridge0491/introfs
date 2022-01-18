@@ -1,0 +1,16 @@
+# (mixed CSharp & FSharp) FSharp sub-product Makefile script.
+
+mix_fs = $(shell ls src/fs/**/**/*.fs | grep -ve App)
+
+$(OUTPUTPATH)/$(proj).FSharp.netmodule: $(mix_fs)
+	-if [ ! "" = "$^" ] ; then \
+		$(FSC) $(FSCFLAGS) /target:module \
+			`$(PKG_CONFIG) --libs $(reqs_src)` /sig:$(OUTPUTPATH)/$(proj).FSharp.fsi \
+			/doc:$(OUTPUTPATH)/$(proj).FSharp.xml /out:$@ $^ ; \
+	fi
+$(OUTPUTPATH)/$(proj).FSharp.dll: $(mix_fs)
+	-if [ ! "" = "$^" ] ; then \
+		$(FSC) $(FSCFLAGS) /target:library $(keyfileopts) $(resourceopts) \
+			`$(PKG_CONFIG) --libs $(reqs_src)` /sig:$(OUTPUTPATH)/$(proj).FSharp.fsi \
+			/doc:$(OUTPUTPATH)/$(proj).FSharp.xml /out:$@ $^ ; \
+	fi

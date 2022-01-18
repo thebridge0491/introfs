@@ -14,20 +14,20 @@ module TpClassic =
     let (modNm, epsilon) = ("TpClassic", 0.001)
     let curry f a b = f(a, b)
     
-    (*[<TestFixtureSetUp>]
-    let setUpModule () = 
+    (*[<OneTimeSetUp>]
+    let setUpModule () =
         printf "\nsetUpModule(%s)\n" modNm ; ignore ()
-    
-    [<TestFixtureTearDown>]
-    let tearDownModule () = 
+
+    [<OneTimeTearDown>]
+    let tearDownModule () =
         ignore () ; printf "tearDownModule(%s)\n" modNm
-    
+
     [<SetUp>]
-    let setUp () = 
+    let setUp () =
         printf "setUp(%s)\n" modNm ; ignore ()
-    
+
     [<TearDown>]
-    let tearDown () = 
+    let tearDown () =
         ignore () ; printf "tearDown(%s)\n" modNm*)
     
     [<Property(MaxTest = 20, Verbose = true)>] [<Category("Tag3")>]

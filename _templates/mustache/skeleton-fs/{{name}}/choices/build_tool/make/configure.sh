@@ -5,11 +5,12 @@ srcdir=.
 vpath=.
 debug=0
 
-#if ! [ build = `basename $PWD` ] ; then
-#	echo ; echo "ERROR: cd build ; [sh] ./configure.sh [OPTIONS]" ;
-#	echo ; exit 1 ;
-#fi
+if [ build = `basename $PWD` ] ; then
+	echo ; echo "ERROR: [sh] ./configure.sh [OPTIONS]" ;
+	echo ; exit 1 ;
+fi
 
+mkdir -p build
 for opt in "$@" ; do
 	case $opt in
 	--prefix=) ;;
@@ -40,6 +41,17 @@ EOF
 if [ 1 = $debug ] ; then
 	cat << EOF >> Makefile ;
 DEBUG = $debug
+
+CONFIG = Debug
+CSCFLAGS = /debug /d:DEBUG /d:TRACE
+FSCFLAGS = /debug /d:DEBUG /d:TRACE
+
+EOF
+else
+	cat << EOF >> Makefile ;
+CONFIG = Release
+CSCFLAGS = /optimize
+FSCFLAGS = /optimize
 
 EOF
 fi

@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/FsCheck
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/FsCheck/lib/net452
+Assemblies=${assemblies_dir}/FsCheck.dll
+
+Name: FsCheck
+Description: FsCheck - A tool for testing .NET programs automatically
+Version: 2.14.3
+Libs: -r:${assemblies_dir}/FsCheck.dll

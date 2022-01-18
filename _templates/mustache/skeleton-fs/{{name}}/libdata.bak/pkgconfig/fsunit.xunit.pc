@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/FsUnit.xUnit
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/FsUnit.xUnit/lib/net46
+Assemblies=${assemblies_dir}/FsUnit.Xunit.dll
+
+Name: FsUnit.xUnit
+Description: FsUnit.xUnit - A set of extensions that add special testing syntax to xUnit 2
+Version: 3.9.0
+Libs: -r:${assemblies_dir}/FsUnit.Xunit.dll

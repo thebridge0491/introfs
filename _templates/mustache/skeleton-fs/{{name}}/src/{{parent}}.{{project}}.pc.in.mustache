@@ -1,0 +1,14 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/{{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/{{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}/lib/net471
+Assemblies=${assemblies_dir}/{{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}.dll
+
+
+Name: {{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}
+Description: {{description}}{{^description}}Utilities sub-package for FSharp Intro examples project.{{/description}}
+URL: https://{{repohost}}{{^repohost}}bitbucket.org{{/repohost}}/{{repoacct}}{{^repoacct}}imcomputer{{/repoacct}}/{{parent}}{{^parent}}introfs{{/parent}}
+Version: {{version}}{{^version}}0.1.0{{/version}}
+Libs: -r:${assemblies_dir}/{{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}.dll

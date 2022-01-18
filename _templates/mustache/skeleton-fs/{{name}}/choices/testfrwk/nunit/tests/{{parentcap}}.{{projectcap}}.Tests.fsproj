@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType Condition=" '$(OutputType)' == '' ">library</OutputType>
+    <!--<OutputType>exe</OutputType>-->
+    <AssemblyFile Condition=" '$(OutputType)' == 'library' ">$(AssemblyName).dll</AssemblyFile>
+    <AssemblyFile Condition=" '$(OutputType)' == 'exe' ">$(AssemblyName).exe</AssemblyFile>
+    <AssemblyOriginatorKeyFile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe'">..\codesign.snk.pub</AssemblyOriginatorKeyFile>
+    <SignAssembly Condition=" '$(AssemblyOriginatorKeyFile)' != '' ">true</SignAssembly>
+    <DelaySign Condition=" '$(AssemblyOriginatorKeyFile)' != '' ">true</DelaySign>
+    <ExeLauncher Condition=" '$(OS)' != 'Windows_NT' ">mono</ExeLauncher>
+    <TargetFramework Condition=" '$(TargetFramework)' == '' ">net471</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AdditionalLibPaths>$(HOME)\nuget\packages</AdditionalLibPaths>
+    <!--<StartupObject Condition=" '$(OutputType)' == 'exe' And '$(StartupObject)' == '' ">$(AssemblyName).TsMain</StartupObject>-->
+    <BuildProjectReferences Condition=" '$(BuildProjectReferences)' == '' ">false</BuildProjectReferences>
+    <!--<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>-->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="microsoft.netframework.referenceassemblies" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime;build;native;contentfiles;analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Condition=" 'netstandard2.0' == '$(TargetFramework)' "
+      Include="netstandard.library"/>
+    <PackageReference Include="fsharp.core"/>
+
+    <PackageReference Include="fscheck.nunit"/>
+    <PackageReference Include="fsunit"/>
+    <PackageReference Include="nunit"/><!-- [nunit|nunitlite] -->
+    <PackageReference Include="nunit.consolerunner"/>
+    <!--<PackageReference Include="fscheck.xunit"/>
+    <PackageReference Include="fsunit.xunit"/>
+    <PackageReference Include="xunit.core"/>
+    <PackageReference Include="xunit.runner.console"/>-->
+    <PackageReference Include="microsoft.net.test.sdk"/>
+
+    <!--<Reference Include="{{parent}}{{^parent}}introfs{{/parent}}{{separator}}{{^separator}}.{{/separator}}{{project}}{{^project}}util{{/project}}">
+      <HintPath Condition=" 'netcoreapp2.0' == '$(TargetFramework)' ">$(HOME)\nuget\packages\{{parentcap}}{{^parentcap}}Introfs{{/parentcap}}.{{projectcap}}{{^projectcap}}Util{{/projectcap}}\lib\netstandard2.0\{{parentcap}}{{^parentcap}}Introfs{{/parentcap}}.{{projectcap}}{{^projectcap}}Util{{/projectcap}}.dll</HintPath>
+      <HintPath Condition=" 'netcoreapp2.0' != '$(TargetFramework)' ">$(HOME)\nuget\packages\{{parentcap}}{{^parentcap}}Introfs{{/parentcap}}.{{projectcap}}{{^projectcap}}Util{{/projectcap}}\lib\$(TargetFramework)\{{parentcap}}{{^parentcap}}Introfs{{/parentcap}}.{{projectcap}}{{^projectcap}}Util{{/projectcap}}.dll</HintPath>
+    </Reference>
+    <PackageReference Include="{{parent}}{{^parent}}introfs{{/parent}}{{separator}}{{^separator}}.{{/separator}}{{project}}{{^project}}util{{/project}}" Version="[{{version}}{{^version}}0.1.0{{/version}},)"/>-->
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\*.*proj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="**\*.fs"/>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!--<TestConsoleFnd ">$(HOME)\.nuget\packages\xunit.runner.console\*\tools\net452\xunit.console.exe</TestConsoleFnd>-->
+    <!--<TestAppArgs>-nologo -appdomains denied -xml TestResult.xml</TestAppArgs>-->
+    <!--<TestConsoleFnd ">$(HOME)\.nuget\packages\nunit.consolerunner\*\tools\nunit3-console.exe</TestConsoleFnd>-->
+    <TestAppArgs>--noheader --domain=None --labels=OnOutputOnly --output=testout.txt "--result=TestResult.xml;format=nunit3"</TestAppArgs>
+  </PropertyGroup>
+  <ItemGroup>
+    <!--<TestConsoleFnd
+    Include="$(HOME)\.nuget\packages\xunit.runner.console\*\tools\net452\xunit.console.exe"/>-->
+    <TestConsoleFnd Include="$(HOME)\.nuget\packages\nunit.consolerunner\*\tools\nunit3-console.exe"/>
+  </ItemGroup>
+
+  <Target Name="Test">
+    <!--<Exec Command="echo $(TestConsoleFnd) | head -n1" ConsoleToMSBuild="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="TestConsoleApp"/>
+    </Exec>-->
+    <PropertyGroup>
+      <TestConsoleApp>%(TestConsoleFnd.Identity)</TestConsoleApp>
+    </PropertyGroup>
+    <Exec WorkingDirectory="bin\$(Configuration)\$(TargetFramework)\" IgnoreExitCode="true"
+      Command="MONO_PATH=$(MONO_PATH):. DYLD_LIBRARY_PATH=$(DYLD_LIBRARY_PATH):. LD_LIBRARY_PATH=$(LD_LIBRARY_PATH):. $(ExeLauncher) $(TestConsoleApp) $(TestAppArgs) $(AssemblyFile) $(TOPTS)"/>
+  </Target>
+  <Target Name="MonoCover" Condition=" '$(OS)' != 'Windows_NT' ">
+    <!--<Exec Command="echo $(TestConsoleFnd) | head -n1" ConsoleToMSBuild="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="TestConsoleApp"/>
+    </Exec>-->
+    <PropertyGroup>
+      <TestConsoleApp>%(TestConsoleFnd.Identity)</TestConsoleApp>
+    </PropertyGroup>
+    <MakeDir Directories="$(MSBuildProjectDirectory)\build"/>
+    <Exec WorkingDirectory="bin\$(Configuration)\$(TargetFramework)\" IgnoreExitCode="true"
+      Command="MONO_PATH=$(MONO_PATH):. DYLD_LIBRARY_PATH=$(DYLD_LIBRARY_PATH):. LD_LIBRARY_PATH=$(LD_LIBRARY_PATH):. $(ExeLauncher) --debug -O=-aot --profile=coverage:output=$(MSBuildProjectDirectory)\build\cov.xml,covfilter-file=$(MSBuildProjectDirectory)\..\resources\covfilter.txt --profile=log:output=$(MSBuildProjectDirectory)\build\cov.dat,covfilter-file=$(MSBuildProjectDirectory)\..\resources\covfilter.txt $(TestConsoleApp) $(TestAppArgs) $(AssemblyFile) $(TOPTS) ; mprof-report --out=$(MSBuildProjectDirectory)\build\cov.txt $(MSBuildProjectDirectory)\build\cov.dat"/>
+  </Target>
+
+</Project>

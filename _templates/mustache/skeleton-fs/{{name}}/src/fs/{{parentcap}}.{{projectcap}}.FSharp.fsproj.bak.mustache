@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <ParentProjectDir Condition=" '$(ParentProjectDir)' == ''">../../</ParentProjectDir>
+    {{^executable}}<OutputType Condition=" '$(OutputType)' == '' ">library</OutputType>{{/executable}}
+    {{#executable}}<OutputType>exe</OutputType>{{/executable}}
+    <AssemblyOriginatorKeyFile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe'">$(ParentProjectDir)codesign.snk.pub</AssemblyOriginatorKeyFile>
+    <SignAssembly Condition=" '$(AssemblyOriginatorKeyFile)' != '' ">true</SignAssembly>
+    <DelaySign Condition=" '$(AssemblyOriginatorKeyFile)' != '' ">true</DelaySign>
+    <ExeLauncher Condition=" '$(OS)' != 'Windows_NT' ">mono</ExeLauncher>
+    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">netstandard2.0;net471;net461</TargetFrameworks>
+
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AdditionalLibPaths>$(HOME)\nuget\packages</AdditionalLibPaths>
+    {{#executable}}
+    <StartupObject Condition=" '$(OutputType)' == 'exe' And '$(StartupObject)' == '' ">{{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}.App</StartupObject>
+    {{/executable}}
+    <IntermediateOutputPath>$(ParentProjectDir)obj\$(Configuration)</IntermediateOutputPath>
+    <OutputPath>$(ParentProjectDir)bin\$(Configuration)</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="microsoft.netframework.referenceassemblies" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime;build;native;contentfiles;analyzers</IncludeAssets>
+    </PackageReference>
+    <!--<Reference Include="netstandard.library" Condition=" 'netstandard2.0' == '$(TargetFramework)' ">
+      <HintPath>$(HOME)\nuget\packages\NETStandard.Library\build\netstandard2.0\ref\netstandard.dll</HintPath>
+    </Reference>-->
+    <PackageReference Include="netstandard.library"/>
+    <PackageReference Include="fsharp.core"/>
+    <!--<PackageReference Include="ini-parser-netstandard"/>-->
+    <!--<PackageReference Include="{{parent}}{{^parent}}introfs{{/parent}}{{separator}}{{^separator}}.{{/separator}}{{project}}{{^project}}util{{/project}}" Version="[0.1.0,)"/>-->
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe' "
+      Include="**\*.fs" Exclude="**\App.fs"/>
+    <Compile Condition=" '$(OutputType)' != 'library' And '$(OutputType)' != 'exe' "
+      Include="**\*.fs" Exclude="**\App.fs;**\properties\*.fs"/>
+    <!--<Compile Include="**\App.fs"/>-->
+  </ItemGroup>
+
+</Project>

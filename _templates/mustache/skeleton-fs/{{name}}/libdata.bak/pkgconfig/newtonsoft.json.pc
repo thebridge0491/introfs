@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/Newtonsoft.Json
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/Newtonsoft.Json/lib/net45
+Assemblies=${assemblies_dir}/Newtonsoft.Json.dll
+
+Name: Json.NET
+Description: Json.NET - A popular high-performance JSON framework for .NET
+Version: 12.0.3
+Libs: -r:${assemblies_dir}/Newtonsoft.Json.dll

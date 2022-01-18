@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/FsCheck.NUnit
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/FsCheck.NUnit/lib/net452
+Assemblies=${assemblies_dir}/FsCheck.NUnit.dll
+
+Name: FsCheck.NUnit
+Description: FsCheck.NUnit - Integrates FsCheck with NUnit by adding a PropertyAttribute that runs FsCheck tests, similar to NUnit TestAttribute
+Version: 2.14.3
+Libs: -r:${assemblies_dir}/FsCheck.NUnit.dll

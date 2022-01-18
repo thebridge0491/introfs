@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/xunit.extensibility.core
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/xunit.extensibility.core/lib/net452
+Assemblies=${assemblies_dir}/xunit.core.dll
+
+Name: xunit.extensibility.core
+Description: xunit.extensibility.core - Includes xunit.core.dll for extensibility purposes
+Version: 2.4.1
+Libs: -r:${assemblies_dir}/xunit.core.dll

@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+#libdir=${exec_prefix}/lib
+#assemblies_dir=${libdir}/mono/log4net
+libdir=${exec_prefix}/../nuget/packages
+assemblies_dir=${libdir}/log4net/lib/net45
+Assemblies=${assemblies_dir}/log4net.dll
+
+Name: log4net
+Description: log4net - .NET logging framework
+Version: 2.0.10
+Libs: -r:${assemblies_dir}/log4net.dll

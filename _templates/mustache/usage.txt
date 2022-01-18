@@ -1,0 +1,101 @@
+Templates for initializing project structure.
+
+Install packages for chosen rendering script:
+  
+  (ruby) gem install [--user-install] mustache
+  
+  [(groovy) grape install com.github.spullara.mustache.java compiler '[0.8.12,)']
+
+  (groovy) grape install com.github.jknack handlebars '[4.1.3,)'
+  
+  (python) pip install [--user] [pystache] chevron
+
+Example usage:
+  
+  ruby render_mustache.rb [--data data.yaml] skeleton-fs [date=2013-10-01]
+  
+  groovy render_mustache.groovy [--data data.yaml] skeleton-fs [--kvset date=2013-10-01]
+  
+  python render_mustache.py [--data data.yaml] skeleton-fs [--kvset date=2013-10-01]
+
+  #resulting project structure
+  
+  echo #---------- ; tree -aF --dirsfirst --matchdirs -I build introfs.util
+
+#----------
+introfs.util
+|-- libdata.bak/
+|   `-- pkgconfig/
+|       |-- fscheck{,.nunit,.xunit}.pc
+|       |-- fsharp.core.pc
+|       |-- fsunit{,.xunit}.pc
+|       |-- ini-parser-netstandard.pc
+|       |-- log4net.pc
+|       |-- mono.options.pc
+|       |-- netstandard.pc
+|       |-- newtonsoft.json.pc
+|       |-- nunit{,lite}.pc
+|       |-- system.diagnostics.textwritertracelistener.pc
+|       |-- xunit.core.pc
+|       |-- xunit.extensibility.{core,execution}.pc
+|       `-- yamldotnet.pc
+|-- resources/
+|   |-- App.config
+|   |-- covfilter.txt
+|   |-- gendarme.ignore
+|   |-- greet.txt
+|   |-- guidgen.{csx,fsx}
+|   |-- mono.supp
+|   `-- prac.{conf,json,toml,xml,yaml}
+|-- src/
+|   |-- cs/
+|   |   |-- introfs/
+|   |   |   `-- util/
+|   |   |       `-- User.cs.bak
+|   |   |-- properties/
+|   |   |   `-- AssemblyInfo.cs
+|   |   |-- Introfs.Util.CSharp.csproj.bak
+|   |   `-- Makefile-CSharp.mk.bak
+|   |-- fs/
+|   |   |-- introfs/
+|   |   |   `-- util/
+|   |   |       |-- Library.fs
+|   |   |       |-- Person.fs
+|   |   |      [|-- App.fs]
+|   |   |       `-- User.fs.bak
+|   |   |-- properties/
+|   |   |   `-- AssemblyInfo.fs
+|   |   |-- Introfs.Util.FSharp.fsproj.bak
+|   |   `-- Makefile.FSharp.mk.bak
+|   `-- introfs.util.pc.in
+|-- targetsmsbuild/
+|   |-- CombineProducts.targets.bak
+|   `-- Tools.Custom.targets
+|-- tests/
+|   |-- fs/
+|   |   |-- base/
+|   |   |   |-- ClsBase.fs
+|   |   |   `-- MyArbitraries.fs
+|   |   `-- introfs/
+|   |       `-- util/
+|   |           |-- TcClassic.fs
+|   |           |-- TcNew.fs
+|   |           |-- TcNewCls.fs
+|   |           |-- TpClassic.fs
+|   |           |-- TpNew.fs
+|   |           |-- TpNewCls.fs
+|   |           `-- TsMain.fs.bak
+|   `-- Introfs.Util.Tests.fsproj
+|-- .editorconfig
+|-- .{git,hg}ignore
+|-- Directory.Build.targets
+|-- Introfs.Util.fsproj
+|-- Introfs.Util.nuspec.bak
+|-- LICENSE
+|-- Makefile-auxffi.mk
+|-- NuGet.Config
+|-- README.rst
+|-- depns_dotnet.sh.bak
+`-- exclude.lst
+
+18 directories, 65 files
