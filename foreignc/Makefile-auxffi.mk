@@ -31,7 +31,7 @@ endif
 CC ?= clang		# clang | gcc
 CPPFLAGS := $(CPPFLAGS) -I$(ffi_incdir)
 LDFLAGS := $(LDFLAGS) -Wl,-rpath,'$$ORIGIN/:$(ffi_libdir)' -L$(ffi_libdir)
-CFLAGS := $(CFLAGS) -Wall -pedantic -std=c99 -m64
+CFLAGS := $(CFLAGS) -Wall -pedantic -std=c99
 ARFLAGS = rvcs
 LDLIBS := $(LDLIBS) -lintro_c-practice
 

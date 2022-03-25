@@ -11,10 +11,10 @@
     <TargetFramework Condition=" '$(TargetFramework)' == '' ">net471</TargetFramework>
 
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <AdditionalLibPaths>$(HOME)\nuget\packages</AdditionalLibPaths>
+    <AdditionalLibPaths>$(HOME)/nuget/packages</AdditionalLibPaths>
     <StartupObject Condition=" '$(OutputType)' == 'exe' And '$(StartupObject)' == '' ">Introfs.Intro.App</StartupObject>
-    <IntermediateOutputPath>$(ParentProjectDir)obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(ParentProjectDir)bin\$(Configuration)</OutputPath>
+    <IntermediateOutputPath>$(ParentProjectDir)obj/$(Configuration)</IntermediateOutputPath>
+    <OutputPath>$(ParentProjectDir)bin/$(Configuration)</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,10 +29,10 @@
 
   <ItemGroup>
     <Compile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe' "
-      Include="**\*.cs" Exclude="**\App.cs"/>
+      Include="**/*.cs" Exclude="**/App.cs"/>
     <Compile Condition=" '$(OutputType)' != 'library' And '$(OutputType)' != 'exe' "
-      Include="**\*.cs" Exclude="**\App.cs;**\properties\*.cs"/>
-    <!--<Compile Include="**\App.cs"/>-->
+      Include="**/*.cs" Exclude="**/App.cs;**/properties/*.cs"/>
+    <!--<Compile Include="**/App.cs"/>-->
   </ItemGroup>
 
 </Project>

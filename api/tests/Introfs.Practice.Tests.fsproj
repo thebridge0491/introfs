@@ -5,7 +5,7 @@
     <OutputType Condition=" '$(OutputType)' == '' ">library</OutputType>
     <AssemblyFile Condition=" '$(OutputType)' == 'library' ">$(AssemblyName).dll</AssemblyFile>
     <AssemblyFile Condition=" '$(OutputType)' == 'exe' ">$(AssemblyName).exe</AssemblyFile>
-    <AssemblyOriginatorKeyFile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe'">..\codesign.snk.pub</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe'">../codesign.snk.pub</AssemblyOriginatorKeyFile>
     <SignAssembly Condition=" '$(AssemblyOriginatorKeyFile)' != '' ">true</SignAssembly>
     <DelaySign Condition=" '$(AssemblyOriginatorKeyFile)' != '' ">true</DelaySign>
     <ExeLauncher Condition=" '$(OS)' != 'Windows_NT' ">mono</ExeLauncher>
@@ -13,7 +13,7 @@
 
     <IsPackable>false</IsPackable>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <AdditionalLibPaths>$(HOME)\nuget\packages</AdditionalLibPaths>
+    <AdditionalLibPaths>$(HOME)/nuget/packages</AdditionalLibPaths>
     <BuildProjectReferences Condition=" '$(BuildProjectReferences)' == '' ">false</BuildProjectReferences>
   </PropertyGroup>
 
@@ -37,35 +37,35 @@
     <PackageReference Include="microsoft.net.test.sdk"/>
 
     <Reference Include="introfs.util">
-      <HintPath Condition=" 'netcoreapp2.0' == '$(TargetFramework)' ">$(HOME)\nuget\packages\Introfs.Util\lib\netstandard2.0\Introfs.Util.dll</HintPath>
-      <HintPath Condition=" 'netcoreapp2.0' != '$(TargetFramework)' ">$(HOME)\nuget\packages\Introfs.Util\lib\$(TargetFramework)\Introfs.Util.dll</HintPath>
+      <HintPath Condition=" 'netcoreapp2.0' == '$(TargetFramework)' ">$(HOME)/nuget/packages/Introfs.Util/lib/netstandard2.0/Introfs.Util.dll</HintPath>
+      <HintPath Condition=" 'netcoreapp2.0' != '$(TargetFramework)' ">$(HOME)/nuget/packages/Introfs.Util/lib/$(TargetFramework)/Introfs.Util.dll</HintPath>
     </Reference>
     <PackageReference Include="introfs.util" Version="[0.1.0,)"/>
     <Reference Include="introfs.practice.csharp">
 	  <Private>True</Private>
-	  <HintPath Condition=" 'netcoreapp2.0' == '$(TargetFramework)' ">bin\$(Configuration)\netstandard2.0\Introfs.Practice.CSharp.dll</HintPath>
-      <HintPath Condition=" 'netcoreapp2.0' != '$(TargetFramework)' ">bin\$(Configuration)\$(TargetFramework)\Introfs.Practice.CSharp.dll</HintPath>
+	  <HintPath Condition=" 'netcoreapp2.0' == '$(TargetFramework)' ">bin/$(Configuration)/netstandard2.0/Introfs.Practice.CSharp.dll</HintPath>
+      <HintPath Condition=" 'netcoreapp2.0' != '$(TargetFramework)' ">bin/$(Configuration)/$(TargetFramework)/Introfs.Practice.CSharp.dll</HintPath>
 	</Reference>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\*.*proj"/>
+    <ProjectReference Include="../*.*proj"/>
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="**\*.fs"/>
+    <Compile Include="**/*.fs"/>
   </ItemGroup>
   
   <PropertyGroup>
-    <!--<TestConsoleFnd ">$(HOME)\.nuget\packages\xunit.runner.console\*\tools\net452\xunit.console.exe</TestConsoleFnd>-->
+    <!--<TestConsoleFnd ">$(HOME)/.nuget/packages/xunit.runner.console/*/tools/net452/xunit.console.exe</TestConsoleFnd>-->
     <!--<TestAppArgs>-nologo -appdomains denied -xml TestResult.xml</TestAppArgs>-->
-    <!--<TestConsoleFnd ">$(HOME)\.nuget\packages\nunit.consolerunner\*\tools\nunit3-console.exe</TestConsoleFnd>-->
+    <!--<TestConsoleFnd ">$(HOME)/.nuget/packages/nunit.consolerunner/*/tools/nunit3-console.exe</TestConsoleFnd>-->
     <TestAppArgs>--noheader --domain=None --labels=OnOutputOnly --output=testout.txt "--result=TestResult.xml;format=nunit3"</TestAppArgs>
   </PropertyGroup>
   <ItemGroup>
     <!--<TestConsoleFnd
-    Include="$(HOME)\.nuget\packages\xunit.runner.console\*\tools\net452\xunit.console.exe"/>-->
-    <TestConsoleFnd Include="$(HOME)\.nuget\packages\nunit.consolerunner\*\tools\nunit3-console.exe"/>
+    Include="$(HOME)/.nuget/packages/xunit.runner.console/*/tools/net452/xunit.console.exe"/>-->
+    <TestConsoleFnd Include="$(HOME)/.nuget/packages/nunit.consolerunner/*/tools/nunit3-console.exe"/>
   </ItemGroup>
 
   <Target Name="Test">
@@ -75,7 +75,7 @@
     <PropertyGroup>
       <TestConsoleApp>%(TestConsoleFnd.Identity)</TestConsoleApp>
     </PropertyGroup>
-    <Exec WorkingDirectory="bin\$(Configuration)\$(TargetFramework)\" IgnoreExitCode="true"
+    <Exec WorkingDirectory="bin/$(Configuration)/$(TargetFramework)/" IgnoreExitCode="true"
       Command="MONO_PATH=$(MONO_PATH):. DYLD_LIBRARY_PATH=$(DYLD_LIBRARY_PATH):. LD_LIBRARY_PATH=$(LD_LIBRARY_PATH):. $(ExeLauncher) $(TestConsoleApp) $(TestAppArgs) $(AssemblyFile) $(TOPTS)"/>
   </Target>
   <Target Name="MonoCover" Condition=" '$(OS)' != 'Windows_NT' ">
@@ -85,9 +85,9 @@
     <PropertyGroup>
       <TestConsoleApp>%(TestConsoleFnd.Identity)</TestConsoleApp>
     </PropertyGroup>
-    <MakeDir Directories="$(MSBuildProjectDirectory)\build"/>
-    <Exec WorkingDirectory="bin\$(Configuration)\$(TargetFramework)\" IgnoreExitCode="true"
-      Command="MONO_PATH=$(MONO_PATH):. DYLD_LIBRARY_PATH=$(DYLD_LIBRARY_PATH):. LD_LIBRARY_PATH=$(LD_LIBRARY_PATH):. $(ExeLauncher) --debug -O=-aot --profile=coverage:output=$(MSBuildProjectDirectory)\build\cov.xml,covfilter-file=$(MSBuildProjectDirectory)\..\resources\covfilter.txt --profile=log:output=$(MSBuildProjectDirectory)\build\cov.dat,covfilter-file=$(MSBuildProjectDirectory)\..\resources\covfilter.txt $(TestConsoleApp) $(TestAppArgs) $(AssemblyFile) $(TOPTS) ; mprof-report --out=$(MSBuildProjectDirectory)\build\cov.txt $(MSBuildProjectDirectory)\build\cov.dat"/>
+    <MakeDir Directories="$(MSBuildProjectDirectory)/build"/>
+    <Exec WorkingDirectory="bin/$(Configuration)/$(TargetFramework)/" IgnoreExitCode="true"
+      Command="MONO_PATH=$(MONO_PATH):. DYLD_LIBRARY_PATH=$(DYLD_LIBRARY_PATH):. LD_LIBRARY_PATH=$(LD_LIBRARY_PATH):. $(ExeLauncher) --debug -O=-aot --profile=coverage:output=$(MSBuildProjectDirectory)/build/cov.xml,covfilter-file=$(MSBuildProjectDirectory)/../resources/covfilter.txt --profile=log:output=$(MSBuildProjectDirectory)/build/cov.dat,covfilter-file=$(MSBuildProjectDirectory)/../resources/covfilter.txt $(TestConsoleApp) $(TestAppArgs) $(AssemblyFile) $(TOPTS) ; mprof-report --out=$(MSBuildProjectDirectory)/build/cov.txt $(MSBuildProjectDirectory)/build/cov.dat"/>
   </Target>
 
 </Project>

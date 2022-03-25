@@ -21,7 +21,7 @@
     <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">netstandard2.0;net471;net461</TargetFrameworks>
 
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <AdditionalLibPaths>$(HOME)\nuget\packages</AdditionalLibPaths>
+    <AdditionalLibPaths>$(HOME)/nuget/packages</AdditionalLibPaths>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
@@ -41,41 +41,41 @@
     <!--<PackageReference Include="ilrepack"/>-->
 
     <Reference Include="introfs.util">
-      <HintPath Condition=" 'netcoreapp2.0' == '$(TargetFramework)' ">$(HOME)\nuget\packages\Introfs.Util\lib\netstandard2.0\Introfs.Util.dll</HintPath>
-      <HintPath Condition=" 'netcoreapp2.0' != '$(TargetFramework)' ">$(HOME)\nuget\packages\Introfs.Util\lib\$(TargetFramework)\Introfs.Util.dll</HintPath>
+      <HintPath Condition=" 'netcoreapp2.0' == '$(TargetFramework)' ">$(HOME)/nuget/packages/Introfs.Util/lib/netstandard2.0/Introfs.Util.dll</HintPath>
+      <HintPath Condition=" 'netcoreapp2.0' != '$(TargetFramework)' ">$(HOME)/nuget/packages/Introfs.Util/lib/$(TargetFramework)/Introfs.Util.dll</HintPath>
     </Reference>
     <PackageReference Include="introfs.util" Version="[0.1.0,)"/>
     <Reference Include="introfs.practice.csharp">
 	  <Private>True</Private>
-	  <HintPath Condition=" 'netcoreapp2.0' == '$(TargetFramework)' ">bin\$(Configuration)\netstandard2.0\Introfs.Practice.CSharp.dll</HintPath>
-      <HintPath Condition=" 'netcoreapp2.0' != '$(TargetFramework)' ">bin\$(Configuration)\$(TargetFramework)\Introfs.Practice.CSharp.dll</HintPath>
+	  <HintPath Condition=" 'netcoreapp2.0' == '$(TargetFramework)' ">bin/$(Configuration)/netstandard2.0/Introfs.Practice.CSharp.dll</HintPath>
+      <HintPath Condition=" 'netcoreapp2.0' != '$(TargetFramework)' ">bin/$(Configuration)/$(TargetFramework)/Introfs.Practice.CSharp.dll</HintPath>
 	</Reference>
   </ItemGroup>
 
   <ItemGroup>
-    <!--<ProjectReference Include="src\fs\*.*proj"/>-->
+    <!--<ProjectReference Include="src/fs/*.*proj"/>-->
     <Content Include="LICENSE">
       <Pack>true</Pack>
       <PackagePath>LICENSE</PackagePath>
     </Content>
-    <Content Include="resources\*.*" Exclude="resources\App.config">
+    <Content Include="resources/*.*" Exclude="resources/App.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>
-    <EmbeddedResource Include="resources\*.*" Exclude="resources\App.config">
+    <EmbeddedResource Include="resources/*.*" Exclude="resources/App.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <LogicalName>$(AssemblyName).resources.%(filename)%(extension)</LogicalName>
     </EmbeddedResource>
-    <!--<None Include="resources\*.*" Exclude="resources\App.config">
+    <!--<None Include="resources/*.*" Exclude="resources/App.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>-->
   </ItemGroup>
   <ItemGroup Condition=" 'netstandard2.0' == '$(TargetFramework)' ">
-    <None Include="$(HOME)\nuget\packages\NETStandard.Library\build\netstandard2.0\ref\netstandard.dll">
+    <None Include="$(HOME)/nuget/packages/NETStandard.Library/build/netstandard2.0/ref/netstandard.dll">
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="$(HOME)\nuget\packages\FSharp.Core\lib\netstandard2.0\FSharp.Core.dll">
+    <None Include="$(HOME)/nuget/packages/FSharp.Core/lib/netstandard2.0/FSharp.Core.dll">
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -83,26 +83,26 @@
 
   <ItemGroup>
     <Compile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe' "
-      Include="src\**\*.fs" Exclude="src\**\App.fs"/>
+      Include="src/**/*.fs" Exclude="src/**/App.fs"/>
     <Compile Condition=" '$(OutputType)' != 'library' And '$(OutputType)' != 'exe' "
-      Include="src\**\*.fs" Exclude="src\**\App.fs;src\**\properties\*.fs"/>
-    <!--<Compile Include="src\**\App.fs"/>-->
-    <MixProjects Include="$(MSBuildProjectDirectory)\src\*\*.*proj"/>
+      Include="src/**/*.fs" Exclude="src/**/App.fs;src/**/properties/*.fs"/>
+    <!--<Compile Include="src/**/App.fs"/>-->
+    <MixProjects Include="$(MSBuildProjectDirectory)/src/*/*.*proj"/>
   </ItemGroup>
 
   <!--<ItemGroup Condition=" '@(MixProjects)' != '' And '$(OutputType)' == 'module'">
-    <AddModules Include="bin\$(Configuration)\net471\$(AssemblyName).netmodule"/>
-    <AddModules Include="bin\$(Configuration)\net471\$(AssemblyName).*.netmodule"/>
+    <AddModules Include="bin/$(Configuration)/net471/$(AssemblyName).netmodule"/>
+    <AddModules Include="bin/$(Configuration)/net471/$(AssemblyName).*.netmodule"/>
   </ItemGroup>
   <ItemGroup Condition=" '@(MixProjects)' != '' And '$(OutputType)' != 'module'">
-    <InputAssemblies Include="bin\$(Configuration)\net471\$(AssemblyName).exe" Condition=" '$(OutputType)' == 'exe' "/>
-    <InputAssemblies Include="bin\$(Configuration)\net471\$(AssemblyName).dll" Condition=" '$(OutputType)' == 'library' "/>
-    <InputAssemblies Include="bin\$(Configuration)\net471\$(AssemblyName).*.dll"/>
+    <InputAssemblies Include="bin/$(Configuration)/net471/$(AssemblyName).exe" Condition=" '$(OutputType)' == 'exe' "/>
+    <InputAssemblies Include="bin/$(Configuration)/net471/$(AssemblyName).dll" Condition=" '$(OutputType)' == 'library' "/>
+    <InputAssemblies Include="bin/$(Configuration)/net471/$(AssemblyName).*.dll"/>
   </ItemGroup>-->
 
-  <Import Project="targetsmsbuild\Tools.*.targets"/>
-  <!--<Import Condition=" Exists('src\cs\$(AssemblyName).CSharp.csproj') "
-    Project="targetsmsbuild\CombineProducts.targets"/>-->
+  <Import Project="targetsmsbuild/Tools.*.targets"/>
+  <!--<Import Condition=" Exists('src/cs/$(AssemblyName).CSharp.csproj') "
+    Project="targetsmsbuild/CombineProducts.targets"/>-->
   <!-- To modify your build process, add your task inside one of the targets
       below and uncomment it. Other similar extension points exist, see
       Microsoft.Common.targets. -->
@@ -113,7 +113,7 @@
   </Target>
   <Target Name="_BuildMixProjects" AfterTargets="BeforeBuild">
 	  <MSBuild Projects="@(MixProjects)" RunEachTargetSeparately="true"
-      Targets="Restore;Build" Properties="ParentProjectDir=$(MSBuildProjectDirectory)\"/>
+      Targets="Restore;Build" Properties="ParentProjectDir=$(MSBuildProjectDirectory)/"/>
   </Target>
 
 </Project>

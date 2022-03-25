@@ -11,9 +11,9 @@
     <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">netstandard2.0;net471;net461</TargetFrameworks>
 
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <AdditionalLibPaths>$(HOME)\nuget\packages</AdditionalLibPaths>
-    <IntermediateOutputPath>$(ParentProjectDir)obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(ParentProjectDir)bin\$(Configuration)</OutputPath>
+    <AdditionalLibPaths>$(HOME)/nuget/packages</AdditionalLibPaths>
+    <IntermediateOutputPath>$(ParentProjectDir)obj/$(Configuration)</IntermediateOutputPath>
+    <OutputPath>$(ParentProjectDir)bin/$(Configuration)</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,10 +28,10 @@
 
   <ItemGroup>
     <Compile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe' "
-      Include="**\*.cs" Exclude="**\App.cs"/>
+      Include="**/*.cs" Exclude="**/App.cs"/>
     <Compile Condition=" '$(OutputType)' != 'library' And '$(OutputType)' != 'exe' "
-      Include="**\*.cs" Exclude="**\App.cs;**\properties\*.cs"/>
-    <!--<Compile Include="**\App.cs"/>-->
+      Include="**/*.cs" Exclude="**/App.cs;**/properties/*.cs"/>
+    <!--<Compile Include="**/App.cs"/>-->
   </ItemGroup>
 
 </Project>
