@@ -12,12 +12,12 @@
     <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">netstandard2.0;net471;net461</TargetFrameworks>
 
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <AdditionalLibPaths>$(HOME)\nuget\packages</AdditionalLibPaths>
+    <AdditionalLibPaths>$(HOME)/nuget/packages</AdditionalLibPaths>
     {{#executable}}
     <StartupObject Condition=" '$(OutputType)' == 'exe' And '$(StartupObject)' == '' ">{{parentcap}}{{^parentcap}}Introfs{{/parentcap}}{{joiner}}{{^joiner}}.{{/joiner}}{{projectcap}}{{^projectcap}}Util{{/projectcap}}.App</StartupObject>
     {{/executable}}
-    <IntermediateOutputPath>$(ParentProjectDir)obj\$(Configuration)</IntermediateOutputPath>
-    <OutputPath>$(ParentProjectDir)bin\$(Configuration)</OutputPath>
+    <IntermediateOutputPath>$(ParentProjectDir)obj/$(Configuration)</IntermediateOutputPath>
+    <OutputPath>$(ParentProjectDir)bin/$(Configuration)</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,7 +26,7 @@
       <IncludeAssets>runtime;build;native;contentfiles;analyzers</IncludeAssets>
     </PackageReference>
     <!--<Reference Include="netstandard.library" Condition=" 'netstandard2.0' == '$(TargetFramework)' ">
-      <HintPath>$(HOME)\nuget\packages\NETStandard.Library\build\netstandard2.0\ref\netstandard.dll</HintPath>
+      <HintPath>$(HOME)/nuget/packages/NETStandard.Library/build/netstandard2.0/ref/netstandard.dll</HintPath>
     </Reference>-->
     <PackageReference Include="netstandard.library"/>
     <PackageReference Include="fsharp.core"/>
@@ -36,10 +36,10 @@
 
   <ItemGroup>
     <Compile Condition=" '$(OutputType)' == 'library' Or '$(OutputType)' == 'exe' "
-      Include="**\*.cs" Exclude="**\App.cs"/>
+      Include="**/*.cs" Exclude="**/App.cs"/>
     <Compile Condition=" '$(OutputType)' != 'library' And '$(OutputType)' != 'exe' "
-      Include="**\*.cs" Exclude="**\App.cs;**\properties\*.cs"/>
-    <!--<Compile Include="**\App.cs"/>-->
+      Include="**/*.cs" Exclude="**/App.cs;**/properties/*.cs"/>
+    <!--<Compile Include="**/App.cs"/>-->
   </ItemGroup>
 
 </Project>

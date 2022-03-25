@@ -13,31 +13,31 @@
   </PropertyGroup>
   <Target Name="_CombineModules" Condition=" '@(AddModules)' != '' "
       Inputs="@(RevFrameworks)" Outputs="%(RevFrameworks.Identity).Dummy">
-    <Csc OutputAssembly="bin\$(Configuration)\%(RevFrameworks.Identity)\$(AssemblyFile)"
+    <Csc OutputAssembly="bin/$(Configuration)/%(RevFrameworks.Identity)/$(AssemblyFile)"
       Sources="$(SourcesAssyInfo)" References=""
       AdditionalLibPaths="$(AdditionalLibPaths)" TargetType="$(TargetType)"
       Optimize="$(Optimize)" DefineConstants="$(DefineConstants)"
       EmitDebugInformation="$(DebugSymbols)" DebugType="$(DebugType)"
       NoLogo="true" CheckForOverflowUnderflow="true" DelaySign="$(DelaySign)"
       AddModules="@(AddModules)" KeyFile="$(AssemblyOriginatorKeyFile)"
-      DocumentationFile="bin\$(Configuration)\%(RevFrameworks.Identity)\$(AssemblyName).xml"/>
+      DocumentationFile="bin/$(Configuration)/%(RevFrameworks.Identity)/$(AssemblyName).xml"/>
   </Target>
   <Target Name="_MergeAssemblies" Condition=" '@(InputAssemblies)' != '' "
       Inputs="@(RevFrameworks)" Outputs="%(RevFrameworks.Identity).Dummy">
     <!--<PropertyGroup>
-      <ILRepackFnd>$(HOME)\.nuget\packages\ilrepack\*\tools\ILRepack.exe</ILRepackFnd>
+      <ILRepackFnd>$(HOME)/.nuget/packages/ilrepack/*/tools/ILRepack.exe</ILRepackFnd>
     </PropertyGroup>
     <Exec Command="echo $(ILRepackFnd) | head -n1" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="ILRepackApp"/>
     </Exec>-->
     <ItemGroup>
-      <ILRepackFnd Include="$(HOME)\.nuget\packages\ilrepack\*\tools\ILRepack.exe"/>
+      <ILRepackFnd Include="$(HOME)/.nuget/packages/ilrepack/*/tools/ILRepack.exe"/>
     </ItemGroup>
     <PropertyGroup>
       <ILRepackApp>%(ILRepackFnd.Identity)</ILRepackApp>
     </PropertyGroup>
-    <Exec WorkingDirectory="bin\$(Configuration)\%(RevFrameworks.Identity)\" IgnoreExitCode="true"
-      Command="$(ExeLauncher) $(ILRepackApp) /verbose /delaysign /keyfile:$(MSBuildProjectDirectory)\$(AssemblyOriginatorKeyFile) /t:$(TargetType) /xmldocs /out:$(AssemblyFile) @(InputAssemblies->'%(Filename)%(Extension)', ' ')"/>
+    <Exec WorkingDirectory="bin/$(Configuration)/%(RevFrameworks.Identity)/" IgnoreExitCode="true"
+      Command="$(ExeLauncher) $(ILRepackApp) /verbose /delaysign /keyfile:$(MSBuildProjectDirectory)/$(AssemblyOriginatorKeyFile) /t:$(TargetType) /xmldocs /out:$(AssemblyFile) @(InputAssemblies->'%(Filename)%(Extension)', ' ')"/>
   </Target>
   <Target Name="_CombineProducts" AfterTargets="AfterBuild"
     DependsOnTargets="_CombineModules;_MergeAssemblies"/>

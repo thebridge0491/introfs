@@ -3,9 +3,9 @@
 
   <PropertyGroup>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
-    <!-- /p:subprojs=\" 'common\*.*proj;app\*.*proj' \" -->
-    <SUBPROJS Condition=" '$(SUBPROJS)' == '' ">common\*.*proj;app\*.*proj</SUBPROJS>
-    <SUBTESTS Condition=" '$(SUBTESTS)' == '' ">common\tests\*.*proj;app\tests\*.*proj</SUBTESTS>
+    <!-- /p:subprojs=\" 'common/*.*proj;app/*.*proj' \" -->
+    <SUBPROJS Condition=" '$(SUBPROJS)' == '' ">common/*.*proj;app/*.*proj</SUBPROJS>
+    <SUBTESTS Condition=" '$(SUBTESTS)' == '' ">common/tests/*.*proj;app/tests/*.*proj</SUBTESTS>
     <ProjectVersion Condition=" '$(ProjectVersion)' =='' ">{{version}}{{^version}}0.1.0{{/version}}</ProjectVersion>
     <!-- /p:fmts=\" 'tar.gz;zip' \" -->
     <FMTS Condition=" '$(FMTS)' == '' ">tar.gz;zip</FMTS>
@@ -15,7 +15,7 @@
   <ItemGroup>
     <SubProjects Include="$(SUBPROJS)"/>
     <SubTests Include="$(SUBTESTS)"/>
-    <AppProjects Include="app\*.*proj"/>
+    <AppProjects Include="app/*.*proj"/>
     <DistFmts Include="$(FMTS)"/>
   </ItemGroup>
   <Target Name="Clean">
@@ -42,7 +42,7 @@
 	  <Copy SourceFiles="exclude.lst" DestinationFolder="build"/>
 	  <RemoveDir Directories="build/$(DistDir)"/>
 	  <MakeDir Directories="build/$(DistDir)"/>
-    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\" IgnoreExitCode="true"
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)/" IgnoreExitCode="true"
       Command="tar $(TAROPTS) -cf - . | tar -xpf - -C build/$(DistDir)"/>
   </Target>
   <Target Name="Dist" Inputs="@(DistFmts)" Outputs="%(Identity).Dummy"
@@ -50,16 +50,16 @@
     <PropertyGroup>
       <Fmt>%(DistFmts.Identity)</Fmt>
     </PropertyGroup>
-    <Delete Files="build\$(DistDir).$(Fmt.ToLower())"/>
-    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\" IgnoreExitCode="true"
+    <Delete Files="build/$(DistDir).$(Fmt.ToLower())"/>
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)/" IgnoreExitCode="true"
       Condition=" $(Fmt.ToLower().StartsWith('7z')) "
-      Command="echo '### build\$(DistDir).7z ###' ; (cd build ; 7za a -t7z -mx=9 $(DistDir).7z $(DistDir))"/>
-    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\" IgnoreExitCode="true"
+      Command="echo '### build/$(DistDir).7z ###' ; (cd build ; 7za a -t7z -mx=9 $(DistDir).7z $(DistDir))"/>
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)/" IgnoreExitCode="true"
       Condition=" $(Fmt.ToLower().StartsWith('tar')) "
-      Command="echo '### build\$(DistDir).$(Fmt.ToLower()) ###' ; tar --posix -L -C build -caf build\$(DistDir).$(Fmt.ToLower()) $(DistDir)"/>
-    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\" IgnoreExitCode="true"
+      Command="echo '### build/$(DistDir).$(Fmt.ToLower()) ###' ; tar --posix -h -C build -caf build/$(DistDir).$(Fmt.ToLower()) $(DistDir)"/>
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)/" IgnoreExitCode="true"
       Condition=" $(Fmt.ToLower().StartsWith('zip')) "
-      Command="echo '### build\$(DistDir).zip ###' ; (cd build ; zip -9 -q -r $(DistDir).zip $(DistDir))"/>
+      Command="echo '### build/$(DistDir).zip ###' ; (cd build ; zip -9 -q -r $(DistDir).zip $(DistDir))"/>
   </Target>
 
   <!--<Target Name="Run">
@@ -72,8 +72,8 @@
     <Message Importance="High" Text="Visual Studio Version: $(VisualStudioVersion)"/>
     <Message Importance="High" Text="MS Build Bin Path: $(MSBuildBinPath)"/>
     <Message Importance="High" Text="MS Build Extensions Path: $(MSBuildExtensionsPath)"/>
-    <Message Importance="High" Text="MS Build Project Directory: $(MSBuildProjectDirectory)\"/>
-    <Exec Command="ls -lh bin\$(Configuration)\net471\"/>
+    <Message Importance="High" Text="MS Build Project Directory: $(MSBuildProjectDirectory)/"/>
+    <Exec Command="ls -lh bin/$(Configuration)/net471/"/>
     <Message Importance="High" Text=" "/>
   </Target>-->
   <Target Name="AfterClean">
