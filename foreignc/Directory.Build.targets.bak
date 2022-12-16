@@ -14,13 +14,13 @@
     <PackageReference Update="xunit.runner.console" Version="[2.4.1,2.5)"/>
     <PackageReference Update="microsoft.net.test.sdk" Version="[16.6.1,16.7)"/>
 
-    <PackageReference Update="log4net" Version="[2.0.10,2.1)"/>
+    <PackageReference Update="log4net" Version="[2.0.15,2.1)"/>
     <PackageReference Update="ini-parser-netstandard" Version="[2.5.2,2.6)"/>
 
     <PackageReference Update="system.diagnostics.textwritertracelistener" Version="[4.3.0,4.4)"/>
     <PackageReference Update="mono.options" Version="[6.6.0.161,6.7)"/>
-    <PackageReference Update="newtonsoft.json" Version="[12.0.3,12.1)"/>
-    <PackageReference Update="yamldotnet" Version="[8.1.2,8.2)"/>
+    <PackageReference Update="newtonsoft.json" Version="[13.0.1,13.1)"/>
+    <PackageReference Update="yamldotnet" Version="[12.0.2,12.1)"/>
 
     <PackageReference Update="mono.gendarme" Version="[2.11.0.20121120,2.12)"/>
     <PackageReference Update="ilrepack" Version="[2.0.18,2.1)"/>
